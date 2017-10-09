@@ -109,7 +109,7 @@ int stop = lines+start;
 while(counts<stop) {
   String line = rd.readLine();
   if(line==null) {atEnd = true; break;}
-  else if (counts>=start) {sbTx.append(line);}
+  else if (counts>=start) {sbTx.append(line+"\n");}
   counts +=1;
   }
 }

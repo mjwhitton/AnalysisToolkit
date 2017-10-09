@@ -36,7 +36,7 @@ return this.getSB();
 
 protected void process(BufferedReader rd) throws IOException {
 try {
-readCharToStringBuilder(rd);
+readLineToStringBuilder(rd);
   }
 catch (IOException e) {System.err.println("Caught IOException: " + e.getMessage());}
 }

@@ -15,25 +15,33 @@ import java.nio.file.*;
 import java.net.*;
 public class TestTextSearch {
   
-public void testingMany()throws FileNotFoundException, IOException {
-Path p = Paths.get("./example_files/?");
+public void testSearchManyStartEndKeywords()throws FileNotFoundException, IOException {
+Path p = Paths.get("./example_files/ComputerScienceArticles.htm");
 ReadFileToStringBuilder rsb = new ReadFileToStringBuilder(1000000, p);
 StringBuilder sbTx = rsb.readProcess();
-TextSearch tx = new TextSearch(true, 10);
+TextSearch tx = new TextSearch();
 tx.loadStringBuilder(sbTx);
-String[] terms = {"???"};
+String[] terms = {"http://thecolbertreport.cc.com", "\">"};
 ArrayList<String> urls = tx.searchMany(terms);
 Utils ut = new Utils();
-StringBuilder sb = ut.arrayListToString(urls, "", true);
-System.out.println(urls);
+StringBuilder sb = ut.arrayListToString(urls, ",", true);
+System.out.println(sb);
 ut.writeFile("urls.txt", sb);
 }
 
-public void test2() throws FileNotFoundException, IOException {
-Path p = Paths.get("./test/id.txt"); 
+public void testSearchManyStarkKeywordPlusOffset()throws FileNotFoundException, IOException {
+Path p = Paths.get("./example_files/ComputerScienceArticles.htm");
 ReadFileToStringBuilder rsb = new ReadFileToStringBuilder(1000000, p);
 StringBuilder sbTx = rsb.readProcess();
-System.out.println(sbTx);   
+TextSearch tx = new TextSearch(true, 30);
+tx.loadStringBuilder(sbTx);
+String[] terms = {"http://www.dukelearntoprogram.com/"};
+ArrayList<String> urls = tx.searchMany(terms);
+Utils ut = new Utils();
+StringBuilder sb = ut.arrayListToString(urls, ",", true);
+System.out.println(sb);
+ut.writeFile("urls.txt", sb);
 }
+
     
 }
