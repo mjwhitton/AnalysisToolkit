@@ -1,9 +1,11 @@
 package Toolkit;
 /**
- * Write a description of TextSearch here.
+ * This method takes in a StringBuilder object and searches in, either:
+ *  * finding a start and end keyword, and returning the text between
+ *  * finding a start keyword, and returning N characters. This can include or exclude the start keyword.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author (Michael Whitton) 
+ * @version (9/10/17)
  */
 import edu.duke.*;
 import org.apache.commons.csv.*;

@@ -1,9 +1,9 @@
 package Toolkit;
 /**
- * Write a description of OpenFile here.
+ * This is a basic method to allow a user to select a file.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author (Michael Whitton) 
+ * @version (9/10/17)
  */
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class OpenFile extends JPanel {
@@ -51,9 +52,8 @@ int returnVal = fc.showOpenDialog(OpenFile.this);
 File file = null;
 if (returnVal == JFileChooser.APPROVE_OPTION) {
   file = fc.getSelectedFile();
-  System.out.println("Opening: " + file.getName() + "." + "\n");}
-else {System.out.println("Open command cancelled by user." + "\n");}
+  JOptionPane.showMessageDialog(null, "Opening: " + file.getName() + "." + "\n", "Opening File", JOptionPane.INFORMATION_MESSAGE);}
+else {JOptionPane.showMessageDialog(null, "Open command cancelled by user." + "\n", "Opening File", JOptionPane.INFORMATION_MESSAGE);}
 return file;  
     }
-    
 }

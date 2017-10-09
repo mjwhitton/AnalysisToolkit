@@ -2,16 +2,17 @@ package Toolkit;
 
 
 /**
- * Write a description of ReadToStringBuilder here.
+ * This method reads a file into a StringBuilder object.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author (Michael Whitton) 
+ * @version (9/10/17)
  */
 import edu.duke.*;
 import org.apache.commons.csv.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
+import javax.swing.JOptionPane;
 public class ReadFileToStringBuilder extends ReadAndProcess {
 
 public ReadFileToStringBuilder(int ln, Path p) {
@@ -35,7 +36,7 @@ protected void process(BufferedReader rd) throws IOException {
 try {
   readLineToStringBuilder(rd);
   }
-catch (IOException e) {System.err.println("Caught IOException: " + e.getMessage());}
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when writing the file" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
 
 }

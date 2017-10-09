@@ -2,10 +2,10 @@ package Toolkit;
 
 
 /**
- * Write a description of CsvAnalysis here.
+ * This method reads in a CSV file and manipulates it.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author (Michael Whitton) 
+ * @version (9/10/17)
  */
 
 import edu.duke.*;
