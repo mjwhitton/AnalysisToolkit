@@ -149,7 +149,7 @@ private void run(String test) throws IOException, Exception{
 private void copyExampleFiles() {
 try{
     Files.createDirectories(Paths.get("./example_files"));
-String rep = "https://github.com/mjwhitton/AnalysisToolkit/tree/master/example_files/";
+String rep = "https://raw.githubusercontent.com/mjwhitton/AnalysisToolkit/master/example_files/";
 String[] urls = {"image_urls.txt", "scopus-search-results-Takaaki-Kajita.csv", "search1.csv", "ComputerScienceArticles.htm"};
 for (int i=0; i<urls.length; i++){
 ReadWebpageSaveFile rwsf = new ReadWebpageSaveFile(2048, "./example_files/");
@@ -163,7 +163,7 @@ catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when saving examp
 private void copyGeneralFiles() {
 try{
     Files.createDirectories(Paths.get("./example_files"));
-String rep = "https://github.com/mjwhitton/AnalysisToolkit/tree/master/";
+String rep = "https://raw.githubusercontent.com/mjwhitton/AnalysisToolkit/master/";
 String[] urls = {"License.txt", "README.TXT"};
 for (int i=0; i<urls.length; i++){
 ReadWebpageSaveFile rwsf = new ReadWebpageSaveFile(2048, "./");
