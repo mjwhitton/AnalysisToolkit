@@ -22,12 +22,14 @@ private int byteRate;
 public ReadWebpageSaveFile (int bytes) {
 atEnd = false;
 byteRate = bytes;
+Utils ut = new Utils();
 outputPath="./output_files/";
 }
 
 public ReadWebpageSaveFile (int bytes, String path) {
 atEnd = false;
 byteRate = bytes;
+Utils ut = new Utils();
 outputPath=path;
 }
 
