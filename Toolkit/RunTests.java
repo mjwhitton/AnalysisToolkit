@@ -1,11 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is used to run the test files for the Toolkit package.
+ * It also created the example_files folder and copies them from GitHub.
+ *
+ * @author (Michael Whitton) 
+ * @version (9/10/17)
  */
 package Toolkit;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -21,6 +25,8 @@ public class RunTests extends javax.swing.JFrame {
      */
     public RunTests() {
         initComponents();
+        copyExampleFiles();
+        copyGeneralFiles();
     }
 
     /**
@@ -139,7 +145,35 @@ private void run(String test) throws IOException, Exception{
     else {
    JOptionPane.showMessageDialog(null, "Test not configured", "Error", JOptionPane.ERROR_MESSAGE);}
 }
-    
+
+private void copyExampleFiles() {
+try{
+    Files.createDirectories(Paths.get("./example_files"));
+String rep = "https://github.com/mjwhitton/AnalysisToolkit/tree/master/example_files/";
+String[] urls = {"image_urls.txt", "scopus-search-results-Takaaki-Kajita.csv", "search1.csv", "ComputerScienceArticles.htm"};
+for (int i=0; i<urls.length; i++){
+ReadWebpageSaveFile rwsf = new ReadWebpageSaveFile(2048, "./example_files/");
+  String destinationFile = rwsf.autoName(rep+urls[i]);
+  rwsf.setFile(rep+urls[i], destinationFile);
+  rwsf.readProcess(0);}
+   }
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when saving examples files" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+}
+
+private void copyGeneralFiles() {
+try{
+    Files.createDirectories(Paths.get("./example_files"));
+String rep = "https://github.com/mjwhitton/AnalysisToolkit/tree/master/";
+String[] urls = {"License.txt", "README.TXT"};
+for (int i=0; i<urls.length; i++){
+ReadWebpageSaveFile rwsf = new ReadWebpageSaveFile(2048, "./");
+  String destinationFile = rwsf.autoName(rep+urls[i]);
+  rwsf.setFile(rep+urls[i], destinationFile);
+  rwsf.readProcess(0);}
+   }
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when saving examples files" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+}
+
     /**
      * @param args the command line arguments
      */
