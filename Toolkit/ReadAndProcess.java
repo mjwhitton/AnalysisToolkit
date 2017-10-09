@@ -1,9 +1,9 @@
 package Toolkit;
 /**
- * Write a description of ReadAndProcess here.
+ * An abstract method for reading files and manipulating them.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author (Michael Whitton) 
+ * @version (9/10/17)
  */
 
 import edu.duke.*;
@@ -13,6 +13,7 @@ import java.util.*;
 import java.nio.file.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import javax.swing.JOptionPane;
 
 public abstract class ReadAndProcess {
 protected int lines;
@@ -22,6 +23,7 @@ protected Path path;
 protected StringBuilder sbTx;
 protected ArrayList<String> list;
 protected String[] columns;
+protected String outputPath;
 
 abstract public void readProcess(int startnum) throws IOException;
     
@@ -29,7 +31,7 @@ protected void readFile() {
 try {
   BufferedReader rd = Files.newBufferedReader(path);
   process(rd);}
-catch (IOException e1) {System.err.println("Caught IOException ("+path+"): " + e1.getMessage());} 
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex+path, "Error", JOptionPane.ERROR_MESSAGE);};
 }
 
 protected void readCsv() throws IOException {
@@ -62,8 +64,7 @@ String webText = "";
 //Open url, if this is not found print the error message
 try {
   is = new URL(url).openStream();}
-catch (NullPointerException e1) {System.err.println("Caught FileNotFoundException ("+url+"): " + e1.getMessage());}
-catch (IOException e2) {System.err.println("Caught IOException ("+url+"): " + e2.getMessage());}
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex+url, "Error", JOptionPane.ERROR_MESSAGE);};
 return is;
      }
 
@@ -76,13 +77,12 @@ try {
   //Stop reading the url
   is.close();}
   //If there is an error print the message
-catch (NullPointerException e1) {System.err.println("Caught: NullPointerException" + e1.getMessage());}
-catch (IOException e2) {System.err.println("Caught IOException" + e2.getMessage());}
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
  
 protected void saveFile(String destinationFile, InputStream is, int byteRate) {
 try {	
-  OutputStream os = new FileOutputStream("./output_files/"+destinationFile);
+  OutputStream os = new FileOutputStream(outputPath+destinationFile);
     byte[] b = new byte[byteRate];
 	int length;
 	while ((length = is.read(b)) != -1) {
@@ -91,7 +91,7 @@ try {
     is.close();
 	os.close();
     }
-catch (IOException e) {System.err.println("Caught: NullPointerException" + e.getMessage());}
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex, "Error", JOptionPane.ERROR_MESSAGE);};
 	}
 
 protected void readCharToStringBuilder(BufferedReader rd) throws IOException {
