@@ -14,16 +14,21 @@ import java.util.*;
 import java.nio.file.*;
 
 public class ReadProcessCsv {
-private final String breaker;
-private final String separator;
-private String process;
-private String searchTerm; 
-private int[] analysisColumn;
-private final Path path;
-private final ArrayList<String> list;
-private int start;
+protected String breaker;
+protected String separator;
+protected String process;
+protected String searchTerm; 
+protected int[] analysisColumn;
+protected Path path;
+protected ArrayList<String> list;
+protected int start;
 Map<String,Integer> map;
-private boolean returnAll;
+protected boolean returnAll;
+
+protected ReadProcessCsv() {
+//Default constructor to allow classes to extend
+list = new ArrayList<>();
+} 
 
 public ReadProcessCsv(String breakerText, String separatorText, Path p) {
 path = p;
@@ -57,7 +62,7 @@ searchTerm = search;
 analysisColumn = analysisCol;
 }
 
-private String processColumn(String entry) {
+protected String processColumn(String entry) {
 if(process.equals("Simple Search") && entry.equals(searchTerm)) {return entry;}    
 
 else if(process.equals("Extract Text"))
