@@ -5,12 +5,9 @@ package Toolkit;
  * This method reads a file into a StringBuilder object.
  * 
  * @author (Michael Whitton) 
- * @version (9/10/17)
+ * @version (13/10/17)
  */
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
-import java.util.*;
 import java.nio.file.*;
 import javax.swing.JOptionPane;
 public class ReadFileToStringBuilder extends ReadAndProcess {
@@ -22,17 +19,19 @@ path = p;
 sbTx = new StringBuilder();
 }
 
-public void readProcess(int startnum) throws IOException {
+@Override
+public void readProcess(int startnum) {
 start = startnum;
 readFile();
 }
 
-public StringBuilder readProcess() throws IOException {
+public StringBuilder readProcess() {
 readProcess(0);
 return this.getSB();
 }
 
-protected void process(BufferedReader rd) throws IOException {
+@Override
+public void process(BufferedReader rd) {
 try {
   readLineToStringBuilder(rd);
   }

@@ -5,13 +5,9 @@ package Toolkit;
  * A method to save a file from the internet.
  * 
  * @author (Michael Whitton) 
- * @version (9/10/17)
+ * @version (13/10/17)
  */
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
-import java.util.*;
-import java.nio.file.*;
 
 public class ReadWebpageSaveFile extends ReadAndProcess {
 private String url;
@@ -44,7 +40,13 @@ url = fileurl;
 destinationFile = filename;
 }
 
-public void readProcess(int startnum) throws IOException {
+@Override
+public void process(BufferedReader rd) {
+//Not needed
+}
+
+@Override
+public void readProcess(int startnum) {
 start = startnum;
 InputStream is = getUrl(url);
 saveFile(destinationFile, is, byteRate);

@@ -5,11 +5,9 @@ package Toolkit;
  * This method reads a file into an ArrayList.
  * 
  * @author (Michael Whitton) 
- * @version (9/10/17)
+ * @version (13/10/17)
  */
 
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
@@ -20,20 +18,22 @@ public ReadFileToArrayList(int ln, Path p) {
 lines = ln;
 atEnd = false;
 path = p;
-list = new ArrayList<String>();
+list = new ArrayList<>();
 }
 
-public void readProcess(int startnum) throws IOException {
+@Override
+public void readProcess(int startnum) {
 start = startnum;
 readFile();
 }
 
-public ArrayList<String> readProcess() throws IOException {
+public ArrayList<String> readProcess() {
 readProcess(0);
 return this.getList();
 }
  
-protected void process(BufferedReader rd) throws IOException {
+@Override
+public void process(BufferedReader rd) {
 try {
 readLineToArrayList(rd);
   }

@@ -3,10 +3,9 @@ package Toolkit;
  * An abstract method for reading files and manipulating them.
  * 
  * @author (Michael Whitton) 
- * @version (9/10/17)
+ * @version (13/10/17)
  */
 
-import edu.duke.*;
 import org.apache.commons.csv.*;
 import java.io.*;
 import java.util.*;
@@ -25,7 +24,7 @@ protected ArrayList<String> list;
 protected String[] columns;
 protected String outputPath;
 
-abstract public void readProcess(int startnum) throws IOException;
+abstract public void readProcess(int startnum) ;
     
 protected void readFile() {
 try {
@@ -34,28 +33,9 @@ try {
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex+path, "Error", JOptionPane.ERROR_MESSAGE);};
 }
 
-protected void readCsv() throws IOException {
-Reader rd = new FileReader(path.toFile());
-CSVParser parser = new CSVParser(rd, 
-  CSVFormat.DEFAULT.withHeader());
-  for (CSVRecord record : parser) {
-    //Check required header are there
-    String[] cm = new String[columns.length];
-    for (int i = 0; i < columns.length; i++) {
-        cm[i] = record.get(columns[i]);
-      }
-    processCsv(cm);
-    }
-  parser.close(); 
-}
 
-protected void process(BufferedReader rd) throws IOException {
-//Define if needed;    
-}
+abstract public void process(BufferedReader rd);
 
-protected void processCsv(String[] cm) {
-//Define if needed;    
-}
 
 protected InputStream getUrl(String url) {
 //Create null version of key objects

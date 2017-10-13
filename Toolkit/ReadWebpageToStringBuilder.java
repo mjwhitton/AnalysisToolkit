@@ -5,13 +5,9 @@ package Toolkit;
  * This method reads in a webpage into a StringBuilder object.
  * 
  * @author (Michael Whitton) 
- * @version (9/10/17)
+ * @version (13/10/17)
  */
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
-import java.util.*;
-import java.nio.file.*;
 import javax.swing.JOptionPane;
 
 public class ReadWebpageToStringBuilder extends ReadAndProcess {
@@ -24,7 +20,8 @@ sbTx = new StringBuilder();
 url = uri;
 }
 
-public void readProcess(int startnum) throws IOException {
+@Override
+public void readProcess(int startnum) {
 start = startnum;
 InputStream is = getUrl(url);
 getWebpage(is);
@@ -35,7 +32,8 @@ readProcess(0);
 return this.getSB();
 }
 
-protected void process(BufferedReader rd) throws IOException {
+@Override
+public void process(BufferedReader rd) {
 try {
 readLineToStringBuilder(rd);
   }
