@@ -7,8 +7,6 @@ package Toolkit;
  * @version (9/10/17)
  */
 
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
@@ -41,7 +39,7 @@ public StringBuilder arrayListToString (ArrayList<String> list, String separator
 StringBuilder sb = new StringBuilder();
 for (int i =0; i < list.size(); i++)
   {String s = list.get(i);
-  sb.append(s+separator);
+  sb.append(s).append(separator);
   if(newLine==true) {sb.append("\n");}
   }
 return sb;    

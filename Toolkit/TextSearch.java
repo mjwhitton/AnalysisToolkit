@@ -7,11 +7,8 @@ package Toolkit;
  * @author (Michael Whitton) 
  * @version (9/10/17)
  */
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
 import java.util.*;
-import java.nio.file.*;
 
 public class TextSearch {
 private StringBuilder sb;
@@ -38,10 +35,10 @@ offset = -1;
 private void initialise(){
 sb = new StringBuilder();
 sbTx = new StringBuilder();
-idList = new ArrayList<String>();
-idList2 = new ArrayList<String>();
+idList = new ArrayList<>();
+idList2 = new ArrayList<>();
 atEnd = false;    
-searchResult = new ArrayList<String>();
+searchResult = new ArrayList<>();
 }   
  
 public void loadStringBuilder(StringBuilder s) {

@@ -3,16 +3,11 @@ package Toolkit;
  * This method runs standard tests for TextSearch.
  * 
  * @author (Michael Whitton) 
- * @version (9/10/17)
+ * @version (13/10/17)
  */
-import edu.duke.*;
-import org.apache.commons.csv.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
 import java.util.*;
 import java.nio.file.*;
-import java.net.*;
 import javax.swing.JOptionPane;
 public class TestTextSearch {
   
