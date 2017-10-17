@@ -22,7 +22,7 @@ protected int[] analysisColumn;
 protected Path path;
 protected ArrayList<String> list;
 protected int start;
-Map<String,Integer> map;
+protected Map<String,Integer> map;
 protected boolean returnAll;
 
 protected ReadProcessCsv() {
@@ -87,7 +87,8 @@ for (CSVRecord record : parser)
   int i = 0;
   for (String c : map.keySet())
     {
-    cm[i] = record.get(c);
+    String cell = record.get(c);
+    cm[i] = cell.replaceAll("\n", "");
     i+=1;
     }
   if(returnAll=true) {row = appendAllCols(cm);}
