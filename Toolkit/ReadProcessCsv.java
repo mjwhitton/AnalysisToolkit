@@ -24,6 +24,8 @@ protected ArrayList<String> list;
 protected int start;
 protected Map<String,Integer> map;
 protected boolean returnAll;
+protected boolean returnList;
+protected List<CSVRecord> csvList;
 
 protected ReadProcessCsv() {
 //Default constructor to allow classes to extend
@@ -36,6 +38,7 @@ breaker = breakerText;
 separator = separatorText;  
 list = new ArrayList<>();
 returnAll = false;
+returnList = false;
 }
 
 public ReadProcessCsv(String breakerText, String separatorText, Path p, boolean retAll) {
@@ -44,7 +47,18 @@ breaker = breakerText;
 separator = separatorText;  
 list = new ArrayList<>();
 returnAll = retAll;
+returnList = false;
 }
+
+public ReadProcessCsv(String breakerText, String separatorText, Path p, boolean retAll, boolean retList) {
+path = p;
+breaker = breakerText;
+separator = separatorText;  
+list = new ArrayList<>();
+returnAll = retAll;
+returnList = retList;
+}
+
 public ArrayList<String> readProcess(String proc, String search, int[] analysisCol) throws IOException {
 setTerms(proc, search, analysisCol);
 readProcess(0);
@@ -80,9 +94,21 @@ Reader rd = new FileReader(path.toFile());
 CSVParser parser = new CSVParser(rd, CSVFormat.DEFAULT.withHeader());
 map = parser.getHeaderMap();
 appendHeader(map);
-for (CSVRecord record : parser)
+
+if (returnList == true) {csvList = parser.getRecords();}
+
+else
   {
-  StringBuilder row = new StringBuilder();
+  for (CSVRecord record : parser)
+    {
+    parseCSVRecord(record);
+    }
+  }
+parser.close();
+}
+
+public void parseCSVRecord (CSVRecord record) {
+StringBuilder row = new StringBuilder();
   String[] cm = new String[map.size()];
   int i = 0;
   for (String c : map.keySet())
@@ -97,8 +123,6 @@ for (CSVRecord record : parser)
   row.append(newCol).append(separator); 
   }
   list.add(row.toString());
-  }
-parser.close();
 }
 
 protected StringBuilder appendAllCols(String[] cm) {
@@ -126,6 +150,10 @@ return map;
 
 public ArrayList<String> getList() {
 return  list;
+}
+
+public List<CSVRecord> getCsvRecords() {
+return csvList;
 }
 
 }
