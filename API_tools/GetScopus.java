@@ -9,10 +9,12 @@ package API_tools;
  */
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import javax.swing.JOptionPane;
+import org.apache.commons.csv.CSVRecord;
 
 public class GetScopus extends Toolkit.ReadProcessCsv {
 private String apiKey;
@@ -28,9 +30,10 @@ int[] analysisCol = {0};
 analysisColumn = analysisCol;
 process="ScopusAPI";
 searchTerm="DOI";
+returnList = true;
 }
 
-public void getScopusDOIs(Path p) {
+public List<CSVRecord> getScopusDOIs(Path p) {
 try
   {
   path = p;
@@ -38,9 +41,7 @@ try
   //System.out.println(map);
   }
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
-Toolkit.Utils ut = new Toolkit.Utils();
-StringBuilder sb = ut.arrayListToString(list, "", true);
-ut.writeFile("scopus.txt", sb);
+return csvList;
 }
 
 @Override
@@ -51,7 +52,7 @@ try{
 doi = extractScopusDOI("2-s2.0-"+entry, headName, headVal);
 //System.out.println(doi);
 }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when writing the file" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){doi="Error when writing the file "+ex;}
 return doi;
 }
 

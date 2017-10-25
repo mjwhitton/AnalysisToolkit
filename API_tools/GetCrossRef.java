@@ -11,6 +11,7 @@ package API_tools;
 import java.util.*;
 import java.nio.file.*;
 import javax.swing.JOptionPane;
+import org.apache.commons.csv.CSVRecord;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -27,6 +28,7 @@ breaker = ";";
 separator = "@"; 
 list = new ArrayList<>();
 returnAll = true;
+returnList = true;
 int[] analysisCol = {0};
 analysisColumn = analysisCol;
 process="CrossRefAPI";
@@ -35,7 +37,7 @@ headName = headNm;
 headVal = headVl;
 }
 
-public void getCrossRefDates(Path p) {
+public List<CSVRecord> getCrossRefDates(Path p) {
 try
   {
   path = p;
@@ -43,10 +45,7 @@ try
 //System.out.println(map);
   }
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
-//System.out.println(list);
-Toolkit.Utils ut = new Toolkit.Utils();
-StringBuilder sb = ut.arrayListToString(list, "", true);
-ut.writeFile("CrossRefData.txt", sb);
+return csvList;
 }
 
 @Override
@@ -66,7 +65,7 @@ try{
 dates = useCrossRefAPI(entry);
 //System.out.println(doi);
 }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when writing the file" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){dates="Error when writing the file"+ex;}
 //System.out.println(dates);
 //System.out.println(list);
 return dates;
@@ -107,8 +106,8 @@ String url = "https://api.crossref.org/works/" + doi;
 API_tools.HttpGet api = new API_tools.HttpGet();
 StringBuilder result = api.getHttpClient(url, headName, headVal);
 //System.out.println(result);
-System.out.println(doi);
-System.out.println(result);
+//System.out.println(doi);
+//System.out.println(result);
 if (result.charAt(0) == '{') {row.append(extractJson(result));}
 else {row.append(result.toString());}
 //System.out.println(row);
@@ -128,7 +127,7 @@ try
     sb.append(getDates("published-print", subJson));    
     }
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){return "Error: "+ex;}
 return sb.toString();
 }
 
