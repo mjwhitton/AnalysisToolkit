@@ -19,17 +19,34 @@ import java.io.Writer;
 import javax.swing.JOptionPane;
 
 public class Utils {
+  
+private String folder;
 
 public Utils() {
+createFolder();
+folder = "./output_files/";
+}
+
+public Utils(String fname) {
+createFolder();
+folder = fname;
+}
+
+private void createFolder() {
 try{Files.createDirectories(Paths.get("./output_files"));}    
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating 'output_files' folder" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
 
 public void writeFile (String fname, StringBuilder sb) {
+String text = sb.toString();
+writeFile(fname, text);
+}
+
+public void writeFile (String fname, String text) {
 //Method to save a StringBuilder as a text file.
 try{
-PrintWriter output = new PrintWriter(new File("./output_files/"+fname));
-  output.write(sb.toString());
+PrintWriter output = new PrintWriter(new File(folder+fname));
+  output.write(text);
   output.close();}
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating 'output_files' folder" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
@@ -48,7 +65,7 @@ return sb;
 public void writeFile2(String fname, StringBuilder sb) throws FileNotFoundException, IOException {
 //An alternative way of coding writeFile.
         try {
-            File f = new File("./output_files/"+fname);
+            File f = new File(folder+fname);
             FileOutputStream is = new FileOutputStream(f);
             OutputStreamWriter osw = new OutputStreamWriter(is);    
             Writer w = new BufferedWriter(osw);
