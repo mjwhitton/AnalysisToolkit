@@ -167,8 +167,6 @@ ut.writeFile(fname, sb);
    */
   public UI_RunTools() {
     initComponents();
-    try {Files.createDirectories(Paths.get("./apikey"));}
-    catch(Exception ex1){JOptionPane.showMessageDialog(null, "Error when creating the apikey folder" +ex1, "Error", JOptionPane.ERROR_MESSAGE);}
     scopusApiKey = getScopusApiKey();
     workingDirectory = new File(System.getProperty("user.dir"));
     fileTextarea.setText("None");
@@ -176,16 +174,27 @@ ut.writeFile(fname, sb);
   }
   
 private String getScopusApiKey() {
-String key = "error";
+String key = "N/A";
 File f = new File("./apikey/scopus.txt");
-if (f.exists())
+if (!f.exists())
+  {
+  try {Files.createDirectories(Paths.get("./apikey"));}
+  catch(Exception ex1){JOptionPane.showMessageDialog(null, "Error when creating the apikey folder" +ex1, "Error", JOptionPane.ERROR_MESSAGE);}
+  String s = JOptionPane.showInputDialog(null, "Cannot load Scopus API key. Please enter this in the box below. Enter 'N/A' if you do not want to use this feature.", "Enter Scopus API Key", JOptionPane.QUESTION_MESSAGE);
+  //System.out.println(s);
+  if (s==null) {s = "N/A";}
+  else if (s.equals("")) {s = "N/A";}
+  Toolkit.Utils ut = new Toolkit.Utils("./apikey/");
+  ut.writeFile("scopus.txt", s);
+  key = s;
+  }  
+else
   {Path p = f.toPath();
   Toolkit.ReadFileToArrayList rfsb = new Toolkit.ReadFileToArrayList(10000,p);
   ArrayList<String> list = rfsb.readProcess();   
   key = list.get(0);
-  textarea.append("Scopus API key "+key+" has been loaded"+"\n");
-  }
-else {JOptionPane.showMessageDialog(null, "Cannot load Scopus API key. Please add this in the first line of the file 'scopus.txt' in the 'api key folder'.", "Error", JOptionPane.ERROR_MESSAGE);}
+    }
+textarea.append("Scopus API key "+key+" has been loaded"+"\n");
 return key;
 }
 
@@ -390,7 +399,7 @@ else {JOptionPane.showMessageDialog(textarea, "No file has been selected", "Erro
   }//GEN-LAST:event_crossRefButtonActionPerformed
 
   private void scopusButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scopusButtonActionPerformed
-if (scopusApiKey.equals("error")) {JOptionPane.showMessageDialog(textarea, "No Scopus API Key is loaded", "Error", JOptionPane.ERROR_MESSAGE);}
+if (scopusApiKey.equals("N/A")) {JOptionPane.showMessageDialog(textarea, "No Scopus API Key is loaded", "Error", JOptionPane.ERROR_MESSAGE);}
 else if (file != null)
   {Path path = file.toPath();
   crossRefButton.setEnabled(false);
