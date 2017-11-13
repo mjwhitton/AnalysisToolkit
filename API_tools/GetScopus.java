@@ -21,9 +21,19 @@ private String apiKey;
 private String doi;
 
 public GetScopus(String key) {
+initialise();
 apiKey = key;
-breaker = ";";
 separator = "@"; 
+}
+
+public GetScopus(String key, String sep) {
+initialise();
+apiKey = key;
+separator = sep; 
+}
+
+private void initialise() {
+breaker = ";";
 list = new ArrayList<>();
 returnAll = true;
 int[] analysisCol = {0};
@@ -57,7 +67,7 @@ return doi;
 }
 
 public String extractScopusDOI(String eid, String[] headName, String[] headVal) throws JSONException {
-String url = "https://api.elsevier.com/content/search/scopus?query=EID("+eid+")&apiKey="+apiKey;
+String url = "https://api.elsevier.com/content/search/scopus?query=EID("+eid.trim()+")&apiKey="+apiKey;
 API_tools.HttpGet api = new API_tools.HttpGet();
 StringBuilder result = api.getHttpClient(url, headName, headVal);
 //StringBuilder result = getHttpClient(url, headName, headVal);

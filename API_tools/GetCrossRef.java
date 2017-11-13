@@ -24,8 +24,21 @@ String dates;
 
 
 public GetCrossRef(String[] headNm, String[] headVl) {
-breaker = ";";
+initialise();
 separator = "@"; 
+headName = headNm;
+headVal = headVl;
+}
+
+public GetCrossRef(String[] headNm, String[] headVl, String sep) {
+initialise();
+separator = sep; 
+headName = headNm;
+headVal = headVl;
+}
+
+private void initialise() {
+breaker = ";";
 list = new ArrayList<>();
 returnAll = true;
 returnList = true;
@@ -33,8 +46,6 @@ int[] analysisCol = {0};
 analysisColumn = analysisCol;
 process="CrossRefAPI";
 searchTerm="Dates";
-headName = headNm;
-headVal = headVl;
 }
 
 public List<CSVRecord> getCrossRefDates(Path p) {
@@ -102,7 +113,7 @@ return sb.toString();
 
 public String useCrossRefAPI(String doi){
 StringBuilder row = new StringBuilder();
-String url = "https://api.crossref.org/works/" + doi;
+String url = "https://api.crossref.org/works/" + doi.trim();
 API_tools.HttpGet api = new API_tools.HttpGet();
 StringBuilder result = api.getHttpClient(url, headName, headVal);
 //System.out.println(result);
