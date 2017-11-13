@@ -65,6 +65,13 @@ readProcess(0);
 return this.getList();
 }
 
+public List<CSVRecord> readProcess() throws IOException {
+int[] AnalyseCol = {0};
+setTerms("", "", AnalyseCol);
+readProcess(0);
+return this.getCsvRecords();
+}
+
 public void readProcess(int startnum) throws IOException {
 start = startnum;
 readCsv();
@@ -120,7 +127,7 @@ StringBuilder row = new StringBuilder();
   if(returnAll=true) {row = appendAllCols(cm);}
   for (int k=0; k < analysisColumn.length; k++)
   {String newCol = processColumn(record.get(analysisColumn[k]));
-  row.append(newCol).append(separator); 
+  if(!newCol.equals(breaker)) {row.append(newCol).append(separator);} 
   }
   list.add(row.toString());
 }
