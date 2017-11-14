@@ -86,13 +86,21 @@ public Void doInBackground() {
 startTime = System.currentTimeMillis();
 if(type.equals("crossref")) {crossRefTask();}
 else if(type.equals("scopus")) {scopusTask();}
+else if(type.equals("altmetric")) {altmetricTask();}
 return null;
 }
 
 private String getSeparator() {
 String s = separatorTextArea.getText();
-if (s==null) {s="@";}
-else if (s.equals("")) {s="@";}
+if (s==null) {s=",";}
+else if (s.equals("")) {s=",";}
+return s;
+}
+
+private String getFileExtension() {
+String s = fileExtensionTextArea.getText();
+if (s==null) {s="csv";}
+else if (s.equals("")) {s="csv";}
 return s;
 }
 
@@ -127,7 +135,7 @@ for (int i=0; i<csvList.size(); i++)
 ArrayList<String> list = gcr.getList();
 Toolkit.Utils ut = new Toolkit.Utils();
 StringBuilder sb = ut.arrayListToString(list, "", true);
-String fname = getFileName()+".txt";
+String fname = getFileName()+"."+getFileExtension();
 ut.writeFile(fname, sb);
 }
 
@@ -153,10 +161,35 @@ for (int i=0; i<csvList.size(); i++)
   }  
 ArrayList<String> list = gs.getList();
 StringBuilder sb = ut.arrayListToString(list, "", true);
-String fname = getFileName()+".txt";
+String fname = getFileName()+"."+getFileExtension();
 ut.writeFile(fname, sb);
 }
 
+private void altmetricTask() {
+String separator = getSeparator();
+API_tools.GetAltmetric ga = new API_tools.GetAltmetric(separator, true);
+appendTextarea("Starting to Analyse "+file.getName()+"\n");
+Toolkit.Utils ut = new Toolkit.Utils();
+List<CSVRecord> csvList =  ga.getAltmetrics(path);
+numberOfRecords = csvList.size();
+currentProgress = 0;
+for (int i=0; i<csvList.size(); i++) 
+  {
+  CSVRecord row = csvList.get(i);
+  ga.parseCSVRecord(row);
+  currentProgress +=1;
+  textarea.append(row.get(0)+"\n");
+  setProgress(100*currentProgress/numberOfRecords);
+  if(this.isCancelled() == true) {break;}
+  else try {TimeUnit.SECONDS.sleep(1);}
+  catch(Exception ex){JOptionPane.showMessageDialog(textarea, "Error when delaying" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+  }
+ArrayList<String> list = ga.getList();
+
+StringBuilder sb = ut.arrayListToString(list, "", true);
+String fname = getFileName()+"."+getFileExtension();
+ut.writeFile(fname, sb);
+}
         /*
          * Executed in event dispatching thread
          */
@@ -166,6 +199,7 @@ ut.writeFile(fname, sb);
  java.awt.Toolkit.getDefaultToolkit().beep();
  crossRefButton.setEnabled(true);
  scopusButton.setEnabled(true);
+ altmetricButton.setEnabled(true);
  chooseFile.setEnabled(true);
  cancelButton.setEnabled(false);
  setCursor(null); //turn off the wait cursor
@@ -187,20 +221,21 @@ ut.writeFile(fname, sb);
     workingDirectory = new File(System.getProperty("user.dir"));
     fileTextarea.setText("None");
     cancelButton.setEnabled(false);
+    readPrefs();
   }
   
 private String getScopusApiKey() {
 String key = "N/A";
-File f = new File("./apikey/scopus.txt");
+File f = new File("./config/scopus.txt");
 if (!f.exists())
   {
-  try {Files.createDirectories(Paths.get("./apikey"));}
+  try {Files.createDirectories(Paths.get("./config"));}
   catch(Exception ex1){JOptionPane.showMessageDialog(null, "Error when creating the apikey folder" +ex1, "Error", JOptionPane.ERROR_MESSAGE);}
   String s = JOptionPane.showInputDialog(null, "Cannot load Scopus API key. Please enter this in the box below. Enter 'N/A' if you do not want to use this feature.", "Enter Scopus API Key", JOptionPane.QUESTION_MESSAGE);
   //System.out.println(s);
   if (s==null) {s = "N/A";}
   else if (s.equals("")) {s = "N/A";}
-  Toolkit.Utils ut = new Toolkit.Utils("./apikey/");
+  Toolkit.Utils ut = new Toolkit.Utils("./config/");
   ut.writeFile("scopus.txt", s);
   key = s;
   }  
@@ -212,6 +247,18 @@ else
     }
 textarea.append("Scopus API key "+key+" has been loaded"+"\n");
 return key;
+}
+
+private void readPrefs() {
+File f = new File("./config/prefs.txt");
+if (f.exists())
+  {
+  Path p = f.toPath();
+  Toolkit.ReadFileToArrayList rfsb = new Toolkit.ReadFileToArrayList(10000,p);
+  ArrayList<String> list = rfsb.readProcess();
+  separatorTextArea.setText(list.get(0));
+  fileExtensionTextArea.setText(list.get(1));
+  }
 }
 
 private void appendTextarea(String text) {
@@ -256,6 +303,11 @@ if ("progress".equals(evt.getPropertyName()))
     separatorLabel = new javax.swing.JLabel();
     jScrollPane2 = new javax.swing.JScrollPane();
     separatorTextArea = new javax.swing.JTextArea();
+    altmetricButton = new javax.swing.JButton();
+    fileExtensionLabel = new javax.swing.JLabel();
+    jScrollPane3 = new javax.swing.JScrollPane();
+    fileExtensionTextArea = new javax.swing.JTextArea();
+    savePrefsButton = new javax.swing.JButton();
 
     jFileChooser1.setAcceptAllFileFilterUsed(false);
     jFileChooser1.setCurrentDirectory(workingDirectory);
@@ -296,7 +348,7 @@ if ("progress".equals(evt.getPropertyName()))
     });
 
     titleLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-    titleLabel.setText("API Tools for Use of the CrossRef and Scopus APIs ");
+    titleLabel.setText("API Tools for Use of the CrossRef, Scopus and Altmetric APIs ");
 
     progressBar.setStringPainted(true);
 
@@ -339,12 +391,39 @@ if ("progress".equals(evt.getPropertyName()))
     separatorTextArea.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
     separatorTextArea.setLineWrap(true);
     separatorTextArea.setRows(2);
-    separatorTextArea.setText("@");
+    separatorTextArea.setText(",");
     separatorTextArea.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
     separatorTextArea.setMinimumSize(new java.awt.Dimension(20, 25));
     separatorTextArea.setPreferredSize(null);
     jScrollPane2.setViewportView(separatorTextArea);
     separatorTextArea.getAccessibleContext().setAccessibleParent(jScrollPane1);
+
+    altmetricButton.setText("Analyse in Altmetric");
+    altmetricButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        altmetricButtonActionPerformed(evt);
+      }
+    });
+
+    fileExtensionLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    fileExtensionLabel.setText("File Extension");
+
+    fileExtensionTextArea.setColumns(20);
+    fileExtensionTextArea.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+    fileExtensionTextArea.setLineWrap(true);
+    fileExtensionTextArea.setRows(2);
+    fileExtensionTextArea.setText("csv");
+    fileExtensionTextArea.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+    fileExtensionTextArea.setMinimumSize(new java.awt.Dimension(20, 25));
+    fileExtensionTextArea.setPreferredSize(null);
+    jScrollPane3.setViewportView(fileExtensionTextArea);
+
+    savePrefsButton.setText("Save Preferences");
+    savePrefsButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        savePrefsButtonActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
@@ -352,31 +431,50 @@ if ("progress".equals(evt.getPropertyName()))
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addGap(34, 34, 34)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-          .addComponent(textareaScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addComponent(titleLabel)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(chooseFile)
-            .addGap(19, 19, 19)
-            .addComponent(crossRefButton)
-            .addGap(36, 36, 36)
-            .addComponent(scopusButton)
-            .addGap(44, 44, 44)
-            .addComponent(cancelButton))
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(saveLog)
-            .addGap(35, 35, 35)
-            .addComponent(clearLog))
+            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, javax.swing.GroupLayout.PREFERRED_SIZE))
           .addGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(fileLabel)
-              .addComponent(separatorLabel))
-            .addGap(28, 28, 28)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))))
-        .addContainerGap(38, Short.MAX_VALUE))
+              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addComponent(textareaScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(fileLabel)
+                    .addComponent(separatorLabel))
+                  .addGap(28, 28, 28)
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                      .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                      .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                      .addComponent(fileExtensionLabel)
+                      .addGap(27, 27, 27)
+                      .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                      .addGap(84, 84, 84)
+                      .addComponent(savePrefsButton)
+                      .addGap(27, 27, 27))))
+                .addGroup(layout.createSequentialGroup()
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(titleLabel)
+                    .addGroup(layout.createSequentialGroup()
+                      .addComponent(saveLog)
+                      .addGap(35, 35, 35)
+                      .addComponent(clearLog)))
+                  .addGap(109, 109, 109)))
+              .addGroup(layout.createSequentialGroup()
+                .addComponent(chooseFile)
+                .addGap(19, 19, 19)
+                .addComponent(crossRefButton)
+                .addGap(36, 36, 36)
+                .addComponent(scopusButton)
+                .addGap(26, 26, 26)
+                .addComponent(altmetricButton)
+                .addGap(60, 60, 60)
+                .addComponent(cancelButton)))
+            .addGap(0, 178, Short.MAX_VALUE)))
+        .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -385,28 +483,36 @@ if ("progress".equals(evt.getPropertyName()))
         .addComponent(titleLabel)
         .addGap(18, 18, 18)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(separatorLabel)
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(fileLabel)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addGap(26, 26, 26)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(chooseFile)
-          .addComponent(crossRefButton)
-          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-            .addComponent(scopusButton)
-            .addComponent(cancelButton)))
-        .addGap(15, 15, 15)
-        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(19, 19, 19)
-        .addComponent(textareaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(18, 18, 18)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(saveLog)
-          .addComponent(clearLog))
-        .addGap(22, 22, 22))
+          .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(separatorLabel)
+              .addComponent(fileExtensionLabel)
+              .addComponent(jScrollPane2)
+              .addComponent(jScrollPane3))
+            .addGap(29, 29, 29)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(fileLabel)
+              .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(chooseFile)
+              .addComponent(crossRefButton)
+              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(scopusButton)
+                .addComponent(cancelButton)
+                .addComponent(altmetricButton)))
+            .addGap(15, 15, 15)
+            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(54, 54, 54)
+            .addComponent(textareaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(18, 18, 18)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+              .addComponent(saveLog)
+              .addComponent(clearLog))
+            .addGap(22, 22, 22))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(savePrefsButton)
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
     );
 
     pack();
@@ -427,6 +533,7 @@ if (file != null)
   {Path path = file.toPath();
   crossRefButton.setEnabled(false);
   scopusButton.setEnabled(false);
+  altmetricButton.setEnabled(false);
   chooseFile.setEnabled(false);
   cancelButton.setEnabled(true);
   setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -445,6 +552,7 @@ else if (file != null)
   {Path path = file.toPath();
   crossRefButton.setEnabled(false);
   scopusButton.setEnabled(false);
+  altmetricButton.setEnabled(false);
   chooseFile.setEnabled(false);
   cancelButton.setEnabled(true);
   setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -476,6 +584,33 @@ scopusButton.setEnabled(true);
 cancelButton.setEnabled(false);
 textarea.append("Analysis cancelled"+"\n");
   }//GEN-LAST:event_cancelButtonActionPerformed
+
+  private void altmetricButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_altmetricButtonActionPerformed
+if (file != null)
+  {Path path = file.toPath();
+  crossRefButton.setEnabled(false);
+  scopusButton.setEnabled(false);
+  altmetricButton.setEnabled(false);
+  chooseFile.setEnabled(false);
+  cancelButton.setEnabled(true);
+  setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //Instances of javax.swing.SwingWorker are not reusuable, so
+        //we create new instances as needed.
+  task = new Task("altmetric", path);
+  task.addPropertyChangeListener(this);
+  task.execute();
+  }
+else {JOptionPane.showMessageDialog(textarea, "No file has been selected", "Error", JOptionPane.ERROR_MESSAGE);}
+  }//GEN-LAST:event_altmetricButtonActionPerformed
+
+  private void savePrefsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePrefsButtonActionPerformed
+StringBuilder sb = new StringBuilder();
+sb.append(separatorTextArea.getText()).append("\n").append(fileExtensionTextArea.getText());
+System.out.println(sb);
+Toolkit.Utils ut = new Toolkit.Utils("./config/");
+ut.writeFile("prefs.txt", sb);
+JOptionPane.showMessageDialog(textarea, "Preferences have been saved to /config", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+  }//GEN-LAST:event_savePrefsButtonActionPerformed
 
   /**
    * @param args the command line arguments
@@ -514,17 +649,22 @@ textarea.append("Analysis cancelled"+"\n");
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton altmetricButton;
   private javax.swing.JButton cancelButton;
   private javax.swing.JButton chooseFile;
   private javax.swing.JButton clearLog;
   private javax.swing.JButton crossRefButton;
+  private javax.swing.JLabel fileExtensionLabel;
+  private javax.swing.JTextArea fileExtensionTextArea;
   private javax.swing.JLabel fileLabel;
   private javax.swing.JTextArea fileTextarea;
   private javax.swing.JFileChooser jFileChooser1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
+  private javax.swing.JScrollPane jScrollPane3;
   private javax.swing.JProgressBar progressBar;
   private javax.swing.JButton saveLog;
+  private javax.swing.JButton savePrefsButton;
   private javax.swing.JButton scopusButton;
   private javax.swing.JLabel separatorLabel;
   private javax.swing.JTextArea separatorTextArea;
