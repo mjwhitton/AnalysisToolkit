@@ -10,6 +10,21 @@ import java.util.*;
 import java.nio.file.*;
 import javax.swing.JOptionPane;
 public class TestTextSearch {
+
+public TestTextSearch() {
+copyExampleFiles(false);
+}
+
+public TestTextSearch(boolean overwrite) {
+copyExampleFiles(overwrite);
+}
+
+private void copyExampleFiles(boolean overwrite) {
+//copy files from GitHub if needed
+Utils ut = new Utils("./example_files/");
+File f = new File("./example_files/ComputerScienceArticles.htm");
+if (!f.exists() || overwrite==true) {ut.copyFileFromGithub("ComputerScienceArticles.htm");}
+}
   
 public void testSearchManyStartEndKeywords()throws FileNotFoundException, IOException {
 Path p = Paths.get("./example_files/ComputerScienceArticles.htm");

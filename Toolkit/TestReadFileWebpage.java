@@ -18,6 +18,19 @@ private StringBuilder result;
 
 public TestReadFileWebpage() {
 result = new StringBuilder();
+copyExampleFiles(false);
+}
+
+public TestReadFileWebpage(boolean overwrite) {
+result = new StringBuilder();
+copyExampleFiles(overwrite);
+}
+
+private void copyExampleFiles(boolean overwrite) {
+//copy files from GitHub if needed
+Utils ut = new Utils("./example_files/");
+File f = new File("./example_files/image_urls.txt");
+if (!f.exists() || overwrite==true) {ut.copyFileFromGithub("image_urls.txt");}
 }
     
 public void testSaveImage() throws Exception {

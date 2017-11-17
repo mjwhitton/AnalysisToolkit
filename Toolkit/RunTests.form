@@ -53,7 +53,7 @@
     <Component class="javax.swing.JComboBox" name="testSelect">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="10">
+          <StringArray count="13">
             <StringItem index="0" value="TestReadCsv - testExtractFileSelect"/>
             <StringItem index="1" value="TestReadCsv - testExtractText"/>
             <StringItem index="2" value="TestReadFileWebpage - testSaveImage"/>
@@ -63,7 +63,10 @@
             <StringItem index="6" value="TestReadFileWebpage - testReadFileToStringBuilder"/>
             <StringItem index="7" value="TestTextSearch - testSearchManyStartEndKeywords"/>
             <StringItem index="8" value="TestTextSearch - testSearchManyStarkKeywordPlusOffset"/>
-            <StringItem index="9" value="[Combo Box Error message]"/>
+            <StringItem index="9" value="TestGetAltmetrics - testGetMetricsWithBadURL"/>
+            <StringItem index="10" value="TestGetAltmetrics - testGetMetrics"/>
+            <StringItem index="11" value="TestGetAltmetrics - testGetAltmetrics"/>
+            <StringItem index="12" value="[Combo Box Error message]"/>
           </StringArray>
         </Property>
       </Properties>

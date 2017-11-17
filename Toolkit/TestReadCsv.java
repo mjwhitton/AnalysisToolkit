@@ -15,8 +15,23 @@ import javax.swing.JOptionPane;
 public class TestReadCsv {
 private final StringBuilder sb;
     
-TestReadCsv() {
+public TestReadCsv() {
 sb = new StringBuilder();
+copyExampleFiles(false);
+}
+
+public TestReadCsv(boolean overwrite) {
+sb = new StringBuilder();
+copyExampleFiles(overwrite);
+}
+
+private void copyExampleFiles(boolean overwrite) {
+//copy files from GitHub if needed
+Utils ut = new Utils("./example_files/");
+File f = new File("./example_files/search1.csv");
+if (!f.exists() || overwrite==true) {ut.copyFileFromGithub("search1.csv");}
+File f2 = new File("./example_files/scopus-search-results-Takaaki-Kajita.csv");
+if (!f2.exists() || overwrite==true) {ut.copyFileFromGithub("scopus-search-results-Takaaki-Kajita.csv");}
 }
 
 public void testExtractFileSelect() throws FileNotFoundException, IOException {

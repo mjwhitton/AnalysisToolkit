@@ -7,6 +7,7 @@ package API_tools;
  * @author (your name) 
  * @version (a version number or a date)
  */
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,7 +16,23 @@ import javax.swing.JOptionPane;
 import org.apache.commons.csv.CSVRecord;
 
 public class TestGetAltmetrics {
-    
+
+public TestGetAltmetrics() {
+copyExampleFiles(false);
+}
+
+public TestGetAltmetrics(boolean overwrite) {
+copyExampleFiles(overwrite);
+}
+  
+private void copyExampleFiles(boolean overwrite) {
+//copy files from GitHub if needed
+Toolkit.Utils ut = new Toolkit.Utils("./example_files/");
+File f1 = new File("./example_files/Altmetric_input.csv");
+if (!f1.exists()) {ut.copyFileFromGithub("Altmetric_input.csv");}
+}
+  
+  
 public void testGetMetricsWithBadURL(){
 String uri = "19.99999";
 String type = "doi";  
