@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URI;
 import javax.swing.JOptionPane;
 
 public class Utils {
@@ -33,8 +34,11 @@ folder = fname;
 }
 
 private void createFolder() {
-try{Files.createDirectories(Paths.get("./output_files"));}    
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating 'output_files' folder" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+try
+  {
+  Files.createDirectories(Paths.get("./output_files"));
+    }  
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating " + folder + " " + ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
 
 public void writeFile (String fname, StringBuilder sb) {
@@ -60,6 +64,39 @@ for (int i =0; i < list.size(); i++)
   if(newLine==true) {sb.append("\n");}
   }
 return sb;    
+}
+
+public void copyFileFromGithub(String file) {
+String fol = folder.substring(1,folder.length());
+copyFileFromGithub(file, file, fol);
+}
+
+public void copyFileFromGithub(String file, String fileName) {
+String fol = folder.substring(1,folder.length());
+copyFileFromGithub(file, fileName, fol);
+}
+
+public void copyFileFromGithub(String file, String fileName, String fol) {
+try
+  {
+   String rep = "https://raw.githubusercontent.com/mjwhitton/AnalysisToolkit/master"+fol;
+  ReadWebpageSaveFile rwsf = new ReadWebpageSaveFile(2048, folder);
+  rwsf.setFile(rep+file, fileName);
+  rwsf.readProcess(0);
+  }
+catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when saving "+file +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+}
+
+public void copyGeneralFiles() {
+copyGeneralFiles(false);
+}
+
+public void copyGeneralFiles(boolean overwrite) {
+Utils ux = new Utils("./");
+File f1 = new File("./License.txt");
+if (!f1.exists() || overwrite==true) {ux.copyFileFromGithub("License.txt");}
+File f2 = new File("./README.TXT");
+if (!f2.exists() || overwrite==true) {ux.copyFileFromGithub("README.TXT");}
 }
 
 public void writeFile2(String fname, StringBuilder sb) throws FileNotFoundException, IOException {
