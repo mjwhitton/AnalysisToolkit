@@ -2,14 +2,13 @@ package API_tools;
 
 
 /**
- * Write a description of GetCrossRef here.
+ * Write a description of GetAltmetriv here.
  * 
  * @author (your name) 
  * @version (a version number or a date)
  */
 
 import Toolkit.ReadWebpageSaveFile;
-import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
 import java.nio.file.*;
@@ -20,8 +19,7 @@ import org.json.JSONObject;
 
 public class GetAltmetric extends Toolkit.ReadProcessCsv {
 private JSONObject json;
-String[] headName;
-String[] headVal;
+private HashMap<String,String> headers;
 private PrintStream errorLog;
 private String[] titleList;
 private String[] nameList;
@@ -59,10 +57,8 @@ int[] analysisCol = {0};
 analysisColumn = analysisCol;
 process="AltmetricAPI";
 searchTerm="ExtractMetrics";
-String[] hdName = {"user-agent"};
-headName = hdName;
-String[] hdVal = {"MWhitton_AltMetric_Tools/1.1 (mailto:mw2@soton.ac.uk)"};
-headVal = hdVal;
+headers = new HashMap<>();
+headers.put("user-agent", "MWhitton_AltMetric_Tools/1.1 (mailto:mw2@soton.ac.uk)");
 //Import config files into Arrays
 buildMaps();
 }
@@ -201,12 +197,11 @@ public String useAltMetricApi(String uri, String type)
 {
 String metrics=""; 
 //Create the uri to pass to the api
- String url = "http://api.altmetric.com/v1/" + type + "/" + uri;
-API_tools.HttpGet api = new API_tools.HttpGet();
-StringBuilder result = api.getHttpClient(url, headName, headVal);
-//System.out.println(result);
+String urlsuffix = type + "/" + uri;
+API_tools.HttpClientClass api = new API_tools.HttpClientClass("http://api.altmetric.com/v1/");
+StringBuilder result = api.getUrl(urlsuffix, headers);
+System.out.println(result);
 //System.out.println(doi);
-//System.out.println(result);
 if (result.charAt(0) == '{')
   {
   try
