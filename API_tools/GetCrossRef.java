@@ -18,23 +18,20 @@ import org.json.JSONArray;
 
 public class GetCrossRef extends Toolkit.ReadProcessCsv {
 private JSONObject json;
-String[] headName;
-String[] headVal;
+private HashMap<String,String> headers;
 String dates;
 
 
-public GetCrossRef(String[] headNm, String[] headVl) {
+public GetCrossRef(HashMap<String,String> hders) {
 initialise();
 separator = "@"; 
-headName = headNm;
-headVal = headVl;
+headers = hders;
 }
 
-public GetCrossRef(String[] headNm, String[] headVl, String sep) {
+public GetCrossRef(HashMap<String,String> hders, String sep) {
 initialise();
 separator = sep; 
-headName = headNm;
-headVal = headVl;
+headers = hders;
 }
 
 private void initialise() {
@@ -113,11 +110,10 @@ return sb.toString();
 
 public String useCrossRefAPI(String doi){
 StringBuilder row = new StringBuilder();
-String url = "https://api.crossref.org/works/" + doi.trim();
-API_tools.HttpGet api = new API_tools.HttpGet();
-StringBuilder result = api.getHttpClient(url, headName, headVal);
+String urlsuffix = "works/" + doi.trim();
+API_tools.HttpClientClass api = new API_tools.HttpClientClass("https://api.crossref.org/");
+StringBuilder result = api.getUrl(urlsuffix, headers);
 //System.out.println(result);
-//System.out.println(doi);
 //System.out.println(result);
 if (result.charAt(0) == '{') {row.append(extractJson(result));}
 else {row.append(result.toString());}

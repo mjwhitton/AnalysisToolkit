@@ -9,6 +9,7 @@ package API_tools;
  */
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,20 +57,20 @@ return csvList;
 
 @Override
 protected String processColumn(String entry) {
-String[] headName = {"Accept"};
-String[] headVal = {"application/json"}; 
+HashMap<String,String> headers = new HashMap<>();
+headers.put("Accept", "application/json");
 try{
-doi = extractScopusDOI("2-s2.0-"+entry, headName, headVal);
+doi = extractScopusDOI("2-s2.0-"+entry, headers);
 //System.out.println(doi);
 }
 catch(Exception ex){doi="Error when writing the file "+ex;}
 return doi;
 }
 
-public String extractScopusDOI(String eid, String[] headName, String[] headVal) throws JSONException {
-String url = "https://api.elsevier.com/content/search/scopus?query=EID("+eid.trim()+")&apiKey="+apiKey;
-API_tools.HttpGet api = new API_tools.HttpGet();
-StringBuilder result = api.getHttpClient(url, headName, headVal);
+public String extractScopusDOI(String eid, HashMap<String,String> headers) throws JSONException {
+String urlsuffix = "content/search/scopus?query=EID("+eid.trim()+")&apiKey="+apiKey;
+API_tools.HttpClientClass api = new API_tools.HttpClientClass("https://api.elsevier.com/");
+StringBuilder result = api.getUrl(urlsuffix, headers);
 //StringBuilder result = getHttpClient(url, headName, headVal);
 //System.out.println(result);
 JSONObject json = new JSONObject(result.toString());
