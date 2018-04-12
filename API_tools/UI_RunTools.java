@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFileChooser;
@@ -38,180 +39,18 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.apache.commons.csv.CSVRecord;
 
-
-class MyCustomFilter extends javax.swing.filechooser.FileFilter {
-@Override
-public boolean accept(File file) {
-// Allow only directories, or files with ".txt" extension
-return file.isDirectory() || file.getAbsolutePath().endsWith(".csv");
-}
-
-@Override
-public String getDescription() {
-// This description will be displayed in the dialog,
-// hard-coded = ugly, should be done via I18N
-return "CSV documents (*.csv)";
-}
-} 
-
 /**
  *
  * @author mw2
  */
 public class UI_RunTools extends javax.swing.JFrame implements PropertyChangeListener {
 
-private File file;
+private static File file;
 private final String scopusApiKey;
 private final File workingDirectory;
 private Task task;
 
-class Task extends SwingWorker<Void, Void> {
-/*
-* Main task. Executed in background thread.
-*/
-private final String type;
-private final Path path;
-private int currentProgress;
-private int numberOfRecords;
-private long startTime;
-private long endTime;
-
-public Task(String taskType, Path p) {
-type = taskType;
-path = p;
-}
-  
-@Override
-public Void doInBackground() {
-startTime = System.currentTimeMillis();
-if(type.equals("crossref")) {crossRefTask();}
-else if(type.equals("scopus")) {scopusTask();}
-else if(type.equals("altmetric")) {altmetricTask();}
-return null;
-}
-
-private String getSeparator() {
-String s = separatorTextArea.getText();
-if (s==null) {s=",";}
-else if (s.equals("")) {s=",";}
-return s;
-}
-
-private String getFileExtension() {
-String s = fileExtensionTextArea.getText();
-if (s==null) {s="csv";}
-else if (s.equals("")) {s="csv";}
-return s;
-}
-
-private String getFileName() {
-String f = file.getName();
-int i = f.lastIndexOf(".");
-if (i != -1) {f=f.substring(0, i);}
-return f;
-}
-
-private void crossRefTask() {
-String[] headName = {"User-Agent"};
-String[] headVal = {"MWhitton_CrossRef_Tools/1.1 (mailto:mw2@soton.ac.uk)"};
-String separator = getSeparator();
-API_tools.GetCrossRef gcr = new API_tools.GetCrossRef(headName, headVal, separator);
-appendTextarea("Starting to Analyse "+file.getName()+"\n");
-List<CSVRecord> csvList =  gcr.getCrossRefDates(path);
-numberOfRecords = csvList.size();
-appendTextarea("Found "+numberOfRecords+" items to analyse."+"\n");
-currentProgress = 0;
-for (int i=0; i<csvList.size(); i++) 
-  {
-  CSVRecord row = csvList.get(i);
-  gcr.parseCSVRecord(row);
-  currentProgress +=1;
-  textarea.append(row.get(0)+"\n");
-  setProgress(100*currentProgress/numberOfRecords);
-  if(this.isCancelled() == true) {break;}
-  else try {TimeUnit.SECONDS.sleep(1);}
-  catch(Exception ex){JOptionPane.showMessageDialog(textarea, "Error when delaying" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
-  }  
-ArrayList<String> list = gcr.getList();
-Toolkit.Utils ut = new Toolkit.Utils();
-StringBuilder sb = ut.arrayListToString(list, "", true);
-String fname = getFileName()+"."+getFileExtension();
-ut.writeFile(fname, sb);
-}
-
-private void scopusTask() {
-String separator = getSeparator();
-API_tools.GetScopus gs = new API_tools.GetScopus(scopusApiKey, separator);
-appendTextarea("Starting to Analyse "+file.getName()+"\n");
-Toolkit.Utils ut = new Toolkit.Utils();
-List<CSVRecord> csvList = gs.getScopusDOIs(path);
-numberOfRecords = csvList.size();
-appendTextarea("Found "+numberOfRecords+" items to analyse."+"\n");
-currentProgress = 0;
-for (int i=0; i<csvList.size(); i++) 
-  {
-  CSVRecord row = csvList.get(i);
-  gs.parseCSVRecord(row);
-  currentProgress +=1;
-  textarea.append(row.get(0)+"\n");
-  setProgress(100*currentProgress/numberOfRecords);
-  if(this.isCancelled() == true) {break;}
-  else try {TimeUnit.SECONDS.sleep(1);}
-  catch(Exception ex){JOptionPane.showMessageDialog(textarea, "Error when delaying" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
-  }  
-ArrayList<String> list = gs.getList();
-StringBuilder sb = ut.arrayListToString(list, "", true);
-String fname = getFileName()+"."+getFileExtension();
-ut.writeFile(fname, sb);
-}
-
-private void altmetricTask() {
-String separator = getSeparator();
-API_tools.GetAltmetric ga = new API_tools.GetAltmetric(separator, true);
-appendTextarea("Starting to Analyse "+file.getName()+"\n");
-Toolkit.Utils ut = new Toolkit.Utils();
-List<CSVRecord> csvList =  ga.getAltmetrics(path);
-numberOfRecords = csvList.size();
-currentProgress = 0;
-for (int i=0; i<csvList.size(); i++) 
-  {
-  CSVRecord row = csvList.get(i);
-  ga.parseCSVRecord(row);
-  currentProgress +=1;
-  textarea.append(row.get(0)+"\n");
-  setProgress(100*currentProgress/numberOfRecords);
-  if(this.isCancelled() == true) {break;}
-  else try {TimeUnit.SECONDS.sleep(1);}
-  catch(Exception ex){JOptionPane.showMessageDialog(textarea, "Error when delaying" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
-  }
-ArrayList<String> list = ga.getList();
-
-StringBuilder sb = ut.arrayListToString(list, "", true);
-String fname = getFileName()+"."+getFileExtension();
-ut.writeFile(fname, sb);
-}
-        /*
-         * Executed in event dispatching thread
-         */
- @Override
- public void done() {
- endTime = System.currentTimeMillis();
- java.awt.Toolkit.getDefaultToolkit().beep();
- crossRefButton.setEnabled(true);
- scopusButton.setEnabled(true);
- altmetricButton.setEnabled(true);
- chooseFile.setEnabled(true);
- cancelButton.setEnabled(false);
- setCursor(null); //turn off the wait cursor
- long timeTaken = (endTime-startTime)/1000;
- long minutes = timeTaken/60;
- long seconds = timeTaken%60;
- textarea.append("Finished analysing. Analysis took "+minutes+" minutes and "+seconds+" seconds \n");
- setProgress(0);
- JOptionPane.showMessageDialog(textarea, "Output file has been saved to /output_files", "Analysis Complete", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-  
+ 
   /**
    * Creates new form UI_RunTools
    */
@@ -226,7 +65,29 @@ ut.writeFile(fname, sb);
     ut.copyGeneralFiles();
     File f = new File("./config/altmetric_config.csv");
     if (!f.exists()) {ut.copyFileFromGithub("altmetric_default_config.csv", "altmetric_config.csv", "/example_files/");}
+    appendTextarea("Branch: Dev");
   }
+  
+public static String getSeparator() {
+String s = separatorTextArea.getText();
+if (s==null) {s=",";}
+else if (s.equals("")) {s=",";}
+return s;
+}
+
+public static String getFileExtension() {
+String s = fileExtensionTextArea.getText();
+if (s==null) {s="csv";}
+else if (s.equals("")) {s="csv";}
+return s;
+}
+
+public static String getFileName() {
+String f = file.getName();
+int i = f.lastIndexOf(".");
+if (i != -1) {f=f.substring(0, i);}
+return f;
+}
   
 private String getScopusApiKey() {
 String key = "N/A";
@@ -265,7 +126,7 @@ if (f.exists())
   }
 }
 
-private void appendTextarea(String text) {
+public static void appendTextarea(String text) {
 textarea.append(text+"\n");
 }
 
@@ -279,6 +140,20 @@ if ("progress".equals(evt.getPropertyName()))
   //"Completed %d%% of task.\n", task.getProgress()));
   } 
  }
+
+public void appendText(String message) {
+appendTextarea(message+"\n");
+}
+
+public void resetButtons() {
+java.awt.Toolkit.getDefaultToolkit().beep();
+ crossRefButton.setEnabled(true);
+ scopusButton.setEnabled(true);
+ altmetricButton.setEnabled(true);
+ chooseFile.setEnabled(true);
+ cancelButton.setEnabled(false);
+ setCursor(null); //turn off the wait cursor
+}
 
   /**
    * This method is called from within the constructor to initialize the form.
@@ -316,7 +191,7 @@ if ("progress".equals(evt.getPropertyName()))
     jFileChooser1.setAcceptAllFileFilterUsed(false);
     jFileChooser1.setCurrentDirectory(workingDirectory);
     jFileChooser1.setDialogTitle("Select a file ...");
-    jFileChooser1.setFileFilter(new MyCustomFilter());
+    jFileChooser1.setFileFilter(new FileFilter_CSV());
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -659,7 +534,7 @@ JOptionPane.showMessageDialog(textarea, "Preferences have been saved to /config"
   private javax.swing.JButton clearLog;
   private javax.swing.JButton crossRefButton;
   private javax.swing.JLabel fileExtensionLabel;
-  private javax.swing.JTextArea fileExtensionTextArea;
+  public static javax.swing.JTextArea fileExtensionTextArea;
   private javax.swing.JLabel fileLabel;
   private javax.swing.JTextArea fileTextarea;
   private javax.swing.JFileChooser jFileChooser1;
@@ -671,8 +546,8 @@ JOptionPane.showMessageDialog(textarea, "Preferences have been saved to /config"
   private javax.swing.JButton savePrefsButton;
   private javax.swing.JButton scopusButton;
   private javax.swing.JLabel separatorLabel;
-  private javax.swing.JTextArea separatorTextArea;
-  private javax.swing.JTextArea textarea;
+  public static javax.swing.JTextArea separatorTextArea;
+  public static javax.swing.JTextArea textarea;
   private java.awt.ScrollPane textareaScrollPane;
   private javax.swing.JScrollPane textareaScrollPane1;
   private javax.swing.JLabel titleLabel;
