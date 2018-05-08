@@ -37,16 +37,16 @@ public abstract class SetTask extends SwingWorker<Void, Void> {
 /*
 * Main task. Executed in background thread.
 */
-private final String type;
-private final Path path;
-private int currentProgress;
-private int numberOfRecords;
-private long startTime;
-private long endTime;
-private String separator;
-private String fileName; 
-private String fileExtension;
-private API_tools.UI_RunTools ui;
+protected final String type;
+protected final Path path;
+protected int currentProgress;
+protected int numberOfRecords;
+protected long startTime;
+protected long endTime;
+protected String separator;
+protected String fileName; 
+protected String fileExtension;
+protected API_tools.UI_RunTools ui;
 
 public SetTask(String taskType, Path p) {
 ui = new API_tools.UI_RunTools();
