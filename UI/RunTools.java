@@ -1,0 +1,554 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2017 mw2.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package UI;
+
+import java.awt.Cursor;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author mw2
+ */
+public class RunTools extends javax.swing.JFrame implements PropertyChangeListener {
+
+private static File file;
+private static String scopusApiKey;
+private final File workingDirectory;
+private UI.Task task;
+//private UI.SetTask task;
+
+ 
+  /**
+   * Creates new form UI_RunTools
+   */
+  public RunTools() {
+    workingDirectory = new File(System.getProperty("user.dir"));
+    initComponents();
+    scopusApiKey = getScopusKey();
+    fileTextarea.setText("None");
+    cancelButton.setEnabled(false);
+    readPrefs();
+    Toolkit.Utils ut = new Toolkit.Utils("./config/");
+    ut.copyGeneralFiles();
+    File f = new File("./config/altmetric_config.csv");
+    if (!f.exists()) {ut.copyFileFromGithub("altmetric_default_config.csv", "altmetric_config.csv", "/example_files/");}
+    appendTextarea("Branch: Dev 1.1");
+  }
+  
+public static String getSeparator() {
+String s = separatorTextArea.getText();
+if (s==null) {s=",";}
+else if (s.equals("")) {s=",";}
+return s;
+}
+
+public static String getFileExtension() {
+String s = fileExtensionTextArea.getText();
+if (s==null) {s="csv";}
+else if (s.equals("")) {s="csv";}
+return s;
+}
+
+public static String getScopusApiKey() {
+return scopusApiKey;
+}
+  
+private String getScopusKey() {
+String key;
+File f = new File("./config/scopus.txt");
+if (!f.exists())
+  {
+  try {Files.createDirectories(Paths.get("./config"));}
+  catch(Exception ex1){JOptionPane.showMessageDialog(null, "Error when creating the apikey folder" +ex1, "Error", JOptionPane.ERROR_MESSAGE);}
+  String s = JOptionPane.showInputDialog(null, "Cannot load Scopus API key. Please enter this in the box below. Enter 'N/A' if you do not want to use this feature.", "Enter Scopus API Key", JOptionPane.QUESTION_MESSAGE);
+  //System.out.println(s);
+  if (s==null) {s = "N/A";}
+  else if (s.equals("")) {s = "N/A";}
+  Toolkit.Utils ut = new Toolkit.Utils("./config/");
+  ut.writeFile("scopus.txt", s);
+  key = s;
+  }  
+else
+  {Path p = f.toPath();
+  Toolkit.ReadFileToArrayList rfsb = new Toolkit.ReadFileToArrayList(10000,p);
+  ArrayList<String> list = rfsb.readProcess();   
+  key = list.get(0);
+  if(key==null) {key="N/A";}
+    }
+appendTextarea("Scopus API key "+key+" has been loaded");
+return key;
+}
+
+private void readPrefs() {
+File f = new File("./config/prefs.txt");
+if (f.exists())
+  {
+  Path p = f.toPath();
+  Toolkit.ReadFileToArrayList rfsb = new Toolkit.ReadFileToArrayList(10000,p);
+  ArrayList<String> list = rfsb.readProcess();
+  separatorTextArea.setText(list.get(0));
+  fileExtensionTextArea.setText(list.get(1));
+  }
+}
+
+public static void appendTextarea(String text) {
+textarea.append(text+"\n");
+}
+
+@Override
+public void propertyChange(PropertyChangeEvent evt) {
+if ("progress".equals(evt.getPropertyName()))
+  {
+  int progress = (Integer) evt.getNewValue();
+  progressBar.setValue(progress);
+  //appendTextarea(String.format(
+  //"Completed %d%% of task.\n", task.getProgress()));
+  } 
+ }
+
+public static void resetButtons() {
+java.awt.Toolkit.getDefaultToolkit().beep();
+ crossRefButton.setEnabled(true);
+ scopusButton.setEnabled(true);
+ altmetricButton.setEnabled(true);
+ chooseFile.setEnabled(true);
+ cancelButton.setEnabled(false);
+}
+
+private static void disableButtons() {
+crossRefButton.setEnabled(false);
+scopusButton.setEnabled(false);
+altmetricButton.setEnabled(false);
+chooseFile.setEnabled(false);
+cancelButton.setEnabled(true);
+}
+
+public void resetCursor() {
+setCursor(null); //turn off the wait cursor
+}
+
+  /**
+   * This method is called from within the constructor to initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private void initComponents() {
+
+    jFileChooser1 = new javax.swing.JFileChooser();
+    jScrollPane1 = new javax.swing.JScrollPane();
+    fileTextarea = new javax.swing.JTextArea();
+    chooseFile = new javax.swing.JButton();
+    fileLabel = new javax.swing.JLabel();
+    crossRefButton = new javax.swing.JButton();
+    scopusButton = new javax.swing.JButton();
+    titleLabel = new javax.swing.JLabel();
+    progressBar = new javax.swing.JProgressBar();
+    saveLog = new javax.swing.JButton();
+    clearLog = new javax.swing.JButton();
+    textareaScrollPane = new java.awt.ScrollPane();
+    textareaScrollPane1 = new javax.swing.JScrollPane();
+    textarea = new javax.swing.JTextArea();
+    cancelButton = new javax.swing.JButton();
+    separatorLabel = new javax.swing.JLabel();
+    jScrollPane2 = new javax.swing.JScrollPane();
+    separatorTextArea = new javax.swing.JTextArea();
+    altmetricButton = new javax.swing.JButton();
+    fileExtensionLabel = new javax.swing.JLabel();
+    jScrollPane3 = new javax.swing.JScrollPane();
+    fileExtensionTextArea = new javax.swing.JTextArea();
+    savePrefsButton = new javax.swing.JButton();
+
+    jFileChooser1.setAcceptAllFileFilterUsed(false);
+    jFileChooser1.setCurrentDirectory(workingDirectory);
+    jFileChooser1.setDialogTitle("Select a file ...");
+    jFileChooser1.setFileFilter(new FileFilter_CSV());
+
+    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+    fileTextarea.setEditable(false);
+    fileTextarea.setColumns(20);
+    fileTextarea.setLineWrap(true);
+    fileTextarea.setRows(2);
+    fileTextarea.setPreferredSize(new java.awt.Dimension(20, 40));
+    jScrollPane1.setViewportView(fileTextarea);
+
+    chooseFile.setText("Choose File");
+    chooseFile.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        chooseFileActionPerformed(evt);
+      }
+    });
+
+    fileLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    fileLabel.setText("File Currently Selected");
+
+    crossRefButton.setText("Analyse in CrossRef");
+    crossRefButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        crossRefButtonActionPerformed(evt);
+      }
+    });
+
+    scopusButton.setText("Analyse in Scopus");
+    scopusButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        scopusButtonActionPerformed(evt);
+      }
+    });
+
+    titleLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+    titleLabel.setText("API Tools for Use of the CrossRef, Scopus and Altmetric APIs ");
+
+    progressBar.setStringPainted(true);
+
+    saveLog.setText("Save log to text");
+    saveLog.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        saveLogActionPerformed(evt);
+      }
+    });
+
+    clearLog.setText("Clear log");
+    clearLog.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        clearLogActionPerformed(evt);
+      }
+    });
+
+    textareaScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    textareaScrollPane1.setAutoscrolls(true);
+
+    textarea.setEditable(false);
+    textarea.setColumns(20);
+    textarea.setRows(2);
+    textarea.setPreferredSize(null);
+    textareaScrollPane1.setViewportView(textarea);
+
+    textareaScrollPane.add(textareaScrollPane1);
+
+    cancelButton.setText("Cancel");
+    cancelButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        cancelButtonActionPerformed(evt);
+      }
+    });
+    cancelButton.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        cancelButtonPropertyChange(evt);
+      }
+    });
+
+    separatorLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    separatorLabel.setText("Separator");
+
+    separatorTextArea.setColumns(20);
+    separatorTextArea.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+    separatorTextArea.setLineWrap(true);
+    separatorTextArea.setRows(2);
+    separatorTextArea.setText(",");
+    separatorTextArea.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+    separatorTextArea.setMinimumSize(new java.awt.Dimension(20, 25));
+    separatorTextArea.setPreferredSize(null);
+    jScrollPane2.setViewportView(separatorTextArea);
+    separatorTextArea.getAccessibleContext().setAccessibleParent(jScrollPane1);
+
+    altmetricButton.setText("Analyse in Altmetric");
+    altmetricButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        altmetricButtonActionPerformed(evt);
+      }
+    });
+
+    fileExtensionLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    fileExtensionLabel.setText("File Extension");
+
+    fileExtensionTextArea.setColumns(20);
+    fileExtensionTextArea.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+    fileExtensionTextArea.setLineWrap(true);
+    fileExtensionTextArea.setRows(2);
+    fileExtensionTextArea.setText("csv");
+    fileExtensionTextArea.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+    fileExtensionTextArea.setMinimumSize(new java.awt.Dimension(20, 25));
+    fileExtensionTextArea.setPreferredSize(null);
+    jScrollPane3.setViewportView(fileExtensionTextArea);
+
+    savePrefsButton.setText("Save Preferences");
+    savePrefsButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        savePrefsButtonActionPerformed(evt);
+      }
+    });
+
+    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+    getContentPane().setLayout(layout);
+    layout.setHorizontalGroup(
+      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(layout.createSequentialGroup()
+        .addGap(34, 34, 34)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addComponent(textareaScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(fileLabel)
+                    .addComponent(separatorLabel))
+                  .addGap(28, 28, 28)
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                      .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                      .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                      .addComponent(fileExtensionLabel)
+                      .addGap(27, 27, 27)
+                      .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                      .addGap(84, 84, 84)
+                      .addComponent(savePrefsButton)
+                      .addGap(27, 27, 27))))
+                .addGroup(layout.createSequentialGroup()
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(titleLabel)
+                    .addGroup(layout.createSequentialGroup()
+                      .addComponent(saveLog)
+                      .addGap(35, 35, 35)
+                      .addComponent(clearLog)))
+                  .addGap(109, 109, 109)))
+              .addGroup(layout.createSequentialGroup()
+                .addComponent(chooseFile)
+                .addGap(19, 19, 19)
+                .addComponent(crossRefButton)
+                .addGap(36, 36, 36)
+                .addComponent(scopusButton)
+                .addGap(26, 26, 26)
+                .addComponent(altmetricButton)
+                .addGap(60, 60, 60)
+                .addComponent(cancelButton)))
+            .addGap(0, 178, Short.MAX_VALUE)))
+        .addContainerGap())
+    );
+    layout.setVerticalGroup(
+      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(layout.createSequentialGroup()
+        .addContainerGap()
+        .addComponent(titleLabel)
+        .addGap(18, 18, 18)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(separatorLabel)
+              .addComponent(fileExtensionLabel)
+              .addComponent(jScrollPane2)
+              .addComponent(jScrollPane3))
+            .addGap(29, 29, 29)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(fileLabel)
+              .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(chooseFile)
+              .addComponent(crossRefButton)
+              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(scopusButton)
+                .addComponent(cancelButton)
+                .addComponent(altmetricButton)))
+            .addGap(15, 15, 15)
+            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(54, 54, 54)
+            .addComponent(textareaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(18, 18, 18)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+              .addComponent(saveLog)
+              .addComponent(clearLog))
+            .addGap(22, 22, 22))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(savePrefsButton)
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+    );
+
+    pack();
+  }// </editor-fold>//GEN-END:initComponents
+
+  private void chooseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFileActionPerformed
+int returnVal = jFileChooser1.showOpenDialog(this);
+if (returnVal == JFileChooser.APPROVE_OPTION)
+  {
+  file = jFileChooser1.getSelectedFile();
+  fileTextarea.setText(file.getAbsolutePath());
+  }
+else {fileTextarea.setText("File access cancelled by user.");}
+  }//GEN-LAST:event_chooseFileActionPerformed
+   
+  private void scopusButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scopusButtonActionPerformed
+if (scopusApiKey.equals("N/A")) {JOptionPane.showMessageDialog(textarea, "No Scopus API Key is loaded", "Error", JOptionPane.ERROR_MESSAGE);}
+else if (file != null)
+  {disableButtons();
+  setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //Instances of javax.swing.SwingWorker are not reusuable, so
+        //we create new instances as needed.
+  //task = new API_tools.Task1("scopus", path);
+  task = new UI.Task("scopus", file);
+  //task = new API_tools.CrossRefTask(path);
+  task.addPropertyChangeListener(this);
+  task.execute();
+  }
+else {JOptionPane.showMessageDialog(textarea, "No file has been selected", "Error", JOptionPane.ERROR_MESSAGE);}
+  }//GEN-LAST:event_scopusButtonActionPerformed
+
+  private void saveLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveLogActionPerformed
+String log = textarea.getText();
+Toolkit.Utils ut = new Toolkit.Utils();
+ut.writeFile("log.txt", log);
+JOptionPane.showMessageDialog(textarea, "Log has been saved to /output_files", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+  }//GEN-LAST:event_saveLogActionPerformed
+
+  private void clearLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearLogActionPerformed
+textarea.setText("");
+JOptionPane.showMessageDialog(textarea, "Log has been cleared.", "Log refreshed", JOptionPane.INFORMATION_MESSAGE);
+  }//GEN-LAST:event_clearLogActionPerformed
+
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+task.cancel(true);
+resetButtons();
+appendTextarea("Analysis cancelled");
+  }//GEN-LAST:event_cancelButtonActionPerformed
+
+  private void altmetricButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_altmetricButtonActionPerformed
+if (file != null)
+  {disableButtons();
+  setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //Instances of javax.swing.SwingWorker are not reusuable, so
+        //we create new instances as needed.
+  task = new UI.Task("altmetric", file);
+  //task = new API_tools.CrossRefTask(path);
+  task.addPropertyChangeListener(this);
+  task.execute();
+  }
+else {JOptionPane.showMessageDialog(textarea, "No file has been selected", "Error", JOptionPane.ERROR_MESSAGE);}
+  }//GEN-LAST:event_altmetricButtonActionPerformed
+
+  private void savePrefsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePrefsButtonActionPerformed
+StringBuilder sb = new StringBuilder();
+sb.append(separatorTextArea.getText()).append("\n").append(fileExtensionTextArea.getText());
+//System.out.println(sb);
+Toolkit.Utils ut = new Toolkit.Utils("./config/");
+ut.writeFile("prefs.txt", sb);
+JOptionPane.showMessageDialog(textarea, "Preferences have been saved to /config", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+  }//GEN-LAST:event_savePrefsButtonActionPerformed
+
+  private void cancelButtonPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cancelButtonPropertyChange
+ if(!cancelButton.isEnabled()) {resetCursor();}
+  }//GEN-LAST:event_cancelButtonPropertyChange
+
+  private void crossRefButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crossRefButtonActionPerformed
+if (file != null)
+  {disableButtons();
+  setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //Instances of javax.swing.SwingWorker are not reusuable, so
+        //we create new instances as needed.
+  //task = new API_tools.Task1("scopus", path);
+  task = new UI.Task("crossref", file);
+  //task = new API_tools.CrossRefTask(path);
+  task.addPropertyChangeListener(this);
+  task.execute();
+  }
+else {JOptionPane.showMessageDialog(textarea, "No file has been selected", "Error", JOptionPane.ERROR_MESSAGE);}
+  }//GEN-LAST:event_crossRefButtonActionPerformed
+
+  /**
+   * @param args the command line arguments
+   */
+  public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+     */
+    try {
+      for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+        if ("Nimbus".equals(info.getName())) {
+          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          break;
+        }
+      }
+    } catch (ClassNotFoundException ex) {
+      java.util.logging.Logger.getLogger(RunTools.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+      java.util.logging.Logger.getLogger(RunTools.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+      java.util.logging.Logger.getLogger(RunTools.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+      java.util.logging.Logger.getLogger(RunTools.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        new RunTools().setVisible(true);
+      }
+    });
+  }
+
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private static javax.swing.JButton altmetricButton;
+  private static javax.swing.JButton cancelButton;
+  private static javax.swing.JButton chooseFile;
+  private javax.swing.JButton clearLog;
+  private static javax.swing.JButton crossRefButton;
+  private javax.swing.JLabel fileExtensionLabel;
+  public static javax.swing.JTextArea fileExtensionTextArea;
+  private javax.swing.JLabel fileLabel;
+  private javax.swing.JTextArea fileTextarea;
+  private javax.swing.JFileChooser jFileChooser1;
+  private javax.swing.JScrollPane jScrollPane1;
+  private javax.swing.JScrollPane jScrollPane2;
+  private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JProgressBar progressBar;
+  private javax.swing.JButton saveLog;
+  private javax.swing.JButton savePrefsButton;
+  private static javax.swing.JButton scopusButton;
+  private javax.swing.JLabel separatorLabel;
+  public static javax.swing.JTextArea separatorTextArea;
+  public static javax.swing.JTextArea textarea;
+  private java.awt.ScrollPane textareaScrollPane;
+  private javax.swing.JScrollPane textareaScrollPane1;
+  private javax.swing.JLabel titleLabel;
+  // End of variables declaration//GEN-END:variables
+}
