@@ -24,7 +24,7 @@ private void copyExampleFiles(boolean overwrite) {
 //copy files from GitHub if needed
 Toolkit.Utils ut = new Toolkit.Utils("./example_files/");
 File f1 = new File("./example_files/Altmetric_input.csv");
-if (!f1.exists()) {ut.copyFileFromGithub("Altmetric_input.csv");}
+if (!f1.exists() || overwrite==true) {ut.copyFileFromGithub("Altmetric_input.csv");}
 }
   
   

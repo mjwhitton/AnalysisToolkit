@@ -49,7 +49,7 @@ private void copyExampleFiles(boolean overwrite) {
 //copy files from GitHub if needed
 Toolkit.Utils ut = new Toolkit.Utils("./example_files/");
 File f1 = new File("./example_files/Scopus_input.csv");
-if (!f1.exists()) {ut.copyFileFromGithub("Crossref_input.csv");}
+if (!f1.exists() || overwrite==true) {ut.copyFileFromGithub("Scopus_input.csv");}
 }
 
 public void testGetScopusDOIs() throws IOException, JSONException {
