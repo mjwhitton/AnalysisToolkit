@@ -9,15 +9,9 @@ package API_tools;
  */
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONArray;
 import javax.swing.JOptionPane;
-import org.apache.commons.csv.CSVRecord;
 
 public class TestGetScopus {
 private String breaker;
