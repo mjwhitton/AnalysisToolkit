@@ -122,19 +122,19 @@ public void readProcess(int startnum) {
 public StringBuilder getUrl(String urlSufix, HashMap<String,String> headers) {
 sbTx = new StringBuilder();
 String getUrl = url+urlSufix;
-System.out.println(getUrl);
+//System.out.println(getUrl);
 HttpGet httpget = new HttpGet(getUrl);
 for (String h : headers.keySet())
   {
   httpget.addHeader(h, headers.get(h));
   }
 allHeaders = httpget.getAllHeaders();
-printHeaders(allHeaders);
+//printHeaders(allHeaders);
 try
   {
   if (context ==null) {response = httpClient.execute(httpget);}
   else {response = httpClient.execute(httpget, context);}
-  System.out.println(response);
+  //System.out.println(response);
   getResponse();
   }
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}

@@ -27,9 +27,7 @@ import java.awt.Cursor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -53,7 +51,7 @@ private UI.Task task;
   public RunTools() {
     workingDirectory = new File(System.getProperty("user.dir"));
     initComponents();
-    scopusApiKey = getScopusKey();
+    getScopusKey();
     fileTextarea.setText("None");
     cancelButton.setEnabled(false);
     readPrefs();
@@ -61,7 +59,6 @@ private UI.Task task;
     ut.copyGeneralFiles();
     File f = new File("./config/altmetric_config.csv");
     if (!f.exists()) {ut.copyFileFromGithub("altmetric_default_config.csv", "altmetric_config.csv", "/example_files/");}
-    appendTextarea("Branch: Dev 1.1");
   }
   
 public static String getSeparator() {
@@ -82,30 +79,15 @@ public static String getScopusApiKey() {
 return scopusApiKey;
 }
   
-private String getScopusKey() {
-String key;
-File f = new File("./config/scopus.txt");
-if (!f.exists())
-  {
-  try {Files.createDirectories(Paths.get("./config"));}
-  catch(Exception ex1){JOptionPane.showMessageDialog(null, "Error when creating the apikey folder" +ex1, "Error", JOptionPane.ERROR_MESSAGE);}
-  String s = JOptionPane.showInputDialog(null, "Cannot load Scopus API key. Please enter this in the box below. Enter 'N/A' if you do not want to use this feature.", "Enter Scopus API Key", JOptionPane.QUESTION_MESSAGE);
-  //System.out.println(s);
-  if (s==null) {s = "N/A";}
-  else if (s.equals("")) {s = "N/A";}
-  Toolkit.Utils ut = new Toolkit.Utils("./config/");
-  ut.writeFile("scopus.txt", s);
-  key = s;
-  }  
-else
-  {Path p = f.toPath();
-  Toolkit.ReadFileToArrayList rfsb = new Toolkit.ReadFileToArrayList(10000,p);
-  ArrayList<String> list = rfsb.readProcess();   
-  key = list.get(0);
-  if(key==null) {key="N/A";}
-    }
+private void getScopusKey() {
+Toolkit.Utils ut = new Toolkit.Utils("./config/");
+String message = "Cannot load Scopus API key. Please enter this in the box below. Enter 'N/A' if you do not want to use this feature."; 
+String heading = "Enter Scopus API Key";
+ArrayList<String> key = ut.getConfigValue("scopus.txt", message, heading);
+String keyval = key.get(0);
+if(keyval==null) {keyval="N/A";}
+scopusApiKey =  keyval;
 appendTextarea("Scopus API key "+key+" has been loaded");
-return key;
 }
 
 private void readPrefs() {
@@ -152,7 +134,7 @@ chooseFile.setEnabled(false);
 cancelButton.setEnabled(true);
 }
 
-public void resetCursor() {
+private void resetCursor() {
 setCursor(null); //turn off the wait cursor
 }
 

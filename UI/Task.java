@@ -137,7 +137,7 @@ outputFile(list);
 
 private void parseList(List<CSVRecord> csvList) {
 numberOfRecords = csvList.size();
-RunTools.appendTextarea("Found "+numberOfRecords+" items to analyse.");
+printMessage("Found "+numberOfRecords+" items to analyse.");
 currentProgress = 0;
 for (int i=0; i<csvList.size(); i++) 
   {

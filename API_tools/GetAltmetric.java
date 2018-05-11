@@ -200,7 +200,7 @@ String metrics="";
 String urlsuffix = type + "/" + uri;
 API_tools.HttpClientClass api = new API_tools.HttpClientClass("http://api.altmetric.com/v1/");
 StringBuilder result = api.getUrl(urlsuffix, headers);
-System.out.println(result);
+//System.out.println(result);
 //System.out.println(doi);
 if (result.charAt(0) == '{')
   {
