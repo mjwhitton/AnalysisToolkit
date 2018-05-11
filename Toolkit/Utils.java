@@ -24,19 +24,20 @@ public class Utils {
 private String folder;
 
 public Utils() {
-createFolder();
 folder = "./output_files/";
+createFolder();
 }
 
 public Utils(String fname) {
-createFolder();
 folder = fname;
+createFolder();
 }
 
 private void createFolder() {
+String fol = folder.substring(0, folder.length()-1);
 try
   {
-  Files.createDirectories(Paths.get("./output_files"));
+  Files.createDirectories(Paths.get(fol));
     }  
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating " + folder + " " + ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
@@ -110,4 +111,23 @@ public void writeFile2(String fname, StringBuilder sb) throws FileNotFoundExcept
             w.close();
         }
         catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when writing the file" +ex, "Error", JOptionPane.ERROR_MESSAGE);};}
+
+public ArrayList<String> getConfigValue(String name, String message, String heading) {
+ArrayList<String> key = new ArrayList<>();
+File f = new File(folder+name);
+if (!f.exists())
+  {
+  String s = JOptionPane.showInputDialog(null, message, heading, JOptionPane.QUESTION_MESSAGE);
+  if (s==null) {s = "N/A";}
+  else if (s.equals("")) {s = "N/A";}
+  writeFile(name, s);
+  key.add(s);
+  }  
+else
+  {Path p = f.toPath();
+  Toolkit.ReadFileToArrayList rfsb = new Toolkit.ReadFileToArrayList(10000,p);
+  key = rfsb.readProcess();   
+  }
+return key;
     }
+}

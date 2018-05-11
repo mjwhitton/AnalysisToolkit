@@ -46,7 +46,7 @@ public class RunTests extends javax.swing.JFrame {
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setName("frame"); // NOI18N
 
-    testSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TestReadCsv - testExtractFileSelect", "TestReadCsv - testExtractText", "TestReadFileWebpage - testSaveImage", "TestReadFileWebpage - testReadAndSave_Images", "TestReadFileWebpage - testReadFileToArrayList", "TestReadFileWebpage - testGetWebpage", "TestReadFileWebpage - testReadFileToStringBuilder", "TestTextSearch - testSearchManyStartEndKeywords", "TestTextSearch - testSearchManyStarkKeywordPlusOffset", "TestGetAltmetrics - testGetMetricsWithBadURL", "TestGetAltmetrics - testGetMetrics", "TestGetAltmetrics - testGetAltmetrics", "[Combo Box Error message]" }));
+    testSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TestReadCsv - testExtractFileSelect", "TestReadCsv - testExtractText", "TestReadFileWebpage - testSaveImage", "TestReadFileWebpage - testReadAndSave_Images", "TestReadFileWebpage - testReadFileToArrayList", "TestReadFileWebpage - testGetWebpage", "TestReadFileWebpage - testReadFileToStringBuilder", "TestTextSearch - testSearchManyStartEndKeywords", "TestTextSearch - testSearchManyStarkKeywordPlusOffset", "TestGetAltmetrics - testGetMetricsWithBadURL", "TestGetAltmetrics - testGetMetrics", "TestGetAltmetrics - testGetAltmetrics", "TestGetCrossRef - testUseCrossRefAPI", "TestGetCrossRef - testGetCrossRef", "TestGetScopus - testGetScopusDOIs", "[Combo Box Error message]" }));
     testSelect.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         testSelectActionPerformed(evt);
@@ -157,6 +157,18 @@ private void run(String test) throws IOException, Exception{
     {API_tools.TestGetAltmetrics tga = new API_tools.TestGetAltmetrics();
     tga.testGetAltmetrics();
     } 
+    else if (test.equals("TestGetCrossRef - testUseCrossRefAPI"))
+    {API_tools.TestGetCrossRef tgc = new API_tools.TestGetCrossRef();
+    tgc.testUseCrossRefAPI();
+    }
+    else if (test.equals("TestGetCrossRef - testGetCrossRef"))
+    {API_tools.TestGetCrossRef tgc = new API_tools.TestGetCrossRef();
+    tgc.testGetCrossRef();
+    }
+    else if (test.equals("TestGetScopus - testGetScopusDOIs"))
+    {API_tools.TestGetScopus tgs = new API_tools.TestGetScopus();
+    tgs.testGetScopusDOIs();
+    }
     else {
    JOptionPane.showMessageDialog(null, "Test not configured", "Error", JOptionPane.ERROR_MESSAGE);}
 }
