@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URI;
 import javax.swing.JOptionPane;
 
 public class Utils {
@@ -54,6 +53,13 @@ PrintWriter output = new PrintWriter(new File(folder+fname));
   output.write(text);
   output.close();}
 catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating 'output_files' folder" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+}
+
+public String autoName(File file) {
+String f = file.getName();
+int i = f.lastIndexOf(".");
+if (i != -1) {f=f.substring(0, i);}
+return f;
 }
 
 public StringBuilder arrayListToString (ArrayList<String> list, String separator, boolean newLine) {
