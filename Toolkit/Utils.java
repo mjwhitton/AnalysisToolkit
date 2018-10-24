@@ -136,4 +136,12 @@ else
   }
 return key;
     }
+
+public String getValue (String message, String heading) {
+String s = JOptionPane.showInputDialog(null, message, heading, JOptionPane.QUESTION_MESSAGE);
+if (s==null) {s = "N/A";}
+else if (s.equals("")) {s = "N/A";}
+return s;
+}
+
 }
