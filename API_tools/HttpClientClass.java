@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +45,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -226,6 +229,46 @@ try
   readCharToStringBuilder(rd);
   }
 catch (IOException e) {System.err.println("Caught IOException: " + e.getMessage());}
+}
+
+public String extractNestedJson(JSONObject json, String name, ArrayList<String> nameList, ArrayList<String> typeList, String separator) throws JSONException
+{
+//Extract readers sub-object
+if(!json.has(name)) {return "N/A";} 
+StringBuilder sb = new StringBuilder();
+//Extract the sub-json object
+JSONObject subJson = json.getJSONObject(name);
+String nj = extractJson(subJson, nameList, typeList, separator);
+return nj;
+   }
+
+private String appendDQ(String str) {
+//Add double quotes to the input string
+return "\"" + str + "\"";
+}
+
+public String extractJson(JSONObject json, ArrayList<String> nameList, ArrayList<String> typeList, String separator) throws JSONException {
+//Create StringBuilder 
+StringBuilder sb = new StringBuilder();
+//Iterate over the nameList array of all the metrics to look for
+for (int i=0; i < nameList.size(); i++)
+  {//Get the corrosponding type and name
+  String curtype = typeList.get(i);
+  String curName = nameList.get(i);
+  //Get string values and append them with double quotes, and add a comma
+  if (json.has(curName) && curtype.equals("string")) {sb.append(appendDQ(json.getString(curName))).append(separator);}
+  // If url was not found (error json recieved) append Error and a comma
+  else if (json.has("Error")) {sb.append("Error"+",");}
+  //Get double values and append them and a comma
+  else if (json.has(curName) && curtype.equals("double")) {sb.append(json.getDouble(curName)).append(separator);}
+  //Get integer values and append them and a comma
+  else if (json.has(curName) && curtype.equals("int")) {sb.append(json.getInt(curName)).append(separator);}
+  //Append n/a and a comma if that metric was not found. Unless it's part of the readers sub-object
+  else if (!curtype.startsWith("readers")) {sb.append("n/a,");}
+  }
+String s = sb.toString();
+s = s.replaceAll("\n", "");
+return s;
 }
 
 public int getStatusCode(){

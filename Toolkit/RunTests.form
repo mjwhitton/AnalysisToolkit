@@ -53,23 +53,25 @@
     <Component class="javax.swing.JComboBox" name="testSelect">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="16">
+          <StringArray count="18">
             <StringItem index="0" value="TestReadCsv - testExtractFileSelect"/>
             <StringItem index="1" value="TestReadCsv - testExtractText"/>
-            <StringItem index="2" value="TestReadFileWebpage - testSaveImage"/>
-            <StringItem index="3" value="TestReadFileWebpage - testReadAndSave_Images"/>
-            <StringItem index="4" value="TestReadFileWebpage - testReadFileToArrayList"/>
-            <StringItem index="5" value="TestReadFileWebpage - testGetWebpage"/>
-            <StringItem index="6" value="TestReadFileWebpage - testReadFileToStringBuilder"/>
-            <StringItem index="7" value="TestTextSearch - testSearchManyStartEndKeywords"/>
-            <StringItem index="8" value="TestTextSearch - testSearchManyStarkKeywordPlusOffset"/>
-            <StringItem index="9" value="TestGetAltmetrics - testGetMetricsWithBadURL"/>
-            <StringItem index="10" value="TestGetAltmetrics - testGetMetrics"/>
-            <StringItem index="11" value="TestGetAltmetrics - testGetAltmetrics"/>
-            <StringItem index="12" value="TestGetCrossRef - testUseCrossRefAPI"/>
-            <StringItem index="13" value="TestGetCrossRef - testGetCrossRef"/>
-            <StringItem index="14" value="TestGetScopus - testGetScopusDOIs"/>
-            <StringItem index="15" value="[Combo Box Error message]"/>
+            <StringItem index="2" value="TestReadCsv - testNewExtractFileSelect"/>
+            <StringItem index="3" value="TestReadFileWebpage - testSaveImage"/>
+            <StringItem index="4" value="TestReadFileWebpage - testReadAndSave_Images"/>
+            <StringItem index="5" value="TestReadFileWebpage - testReadFileToArrayList"/>
+            <StringItem index="6" value="TestReadFileWebpage - testGetWebpage"/>
+            <StringItem index="7" value="TestReadFileWebpage - testReadFileToStringBuilder"/>
+            <StringItem index="8" value="TestTextSearch - testSearchManyStartEndKeywords"/>
+            <StringItem index="9" value="TestTextSearch - testSearchManyStarkKeywordPlusOffset"/>
+            <StringItem index="10" value="TestGetAltmetrics - testGetMetricsWithBadURL"/>
+            <StringItem index="11" value="TestGetAltmetrics - testGetMetrics"/>
+            <StringItem index="12" value="TestGetAltmetrics - testGetAltmetrics"/>
+            <StringItem index="13" value="TestGetCrossRef - testUseCrossRefAPI"/>
+            <StringItem index="14" value="TestGetCrossRef - testGetCrossRef"/>
+            <StringItem index="15" value="TestGetDOIs - testGetDOIs"/>
+            <StringItem index="16" value="TestGetScopus - testGetScopusDOIs"/>
+            <StringItem index="17" value="[Combo Box Error message]"/>
           </StringArray>
         </Property>
       </Properties>
