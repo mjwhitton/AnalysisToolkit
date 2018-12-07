@@ -21,24 +21,34 @@ import javax.swing.JOptionPane;
 public class Utils {
   
 private String folder;
+private StringBuilder errorLog;
+private boolean log;
 
 public Utils() {
 folder = "./output_files/";
-createFolder();
+createFolder(folder);
+errorLog = new StringBuilder();
+log = false;
 }
 
 public Utils(String fname) {
 folder = fname;
-createFolder();
+createFolder(folder);
+errorLog = new StringBuilder();
+log = false;
 }
 
-private void createFolder() {
-String fol = folder.substring(0, folder.length()-1);
+public void createFolder(String fldr) {
+String fol = fldr.substring(0, fldr.length()-1);
 try
   {
   Files.createDirectories(Paths.get(fol));
     }  
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating " + folder + " " + ex, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){logError(ex,"Error when creating " + folder, log);}
+}
+
+public void setFolder(String fol) {
+folder = fol;
 }
 
 public void writeFile (String fname, StringBuilder sb) {
@@ -52,7 +62,7 @@ try{
 PrintWriter output = new PrintWriter(new File(folder+fname));
   output.write(text);
   output.close();}
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating 'output_files' folder" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){logError(ex,"Error when creating 'output_files' folder", log);}
 }
 
 public String autoName(File file) {
@@ -91,7 +101,7 @@ try
   rwsf.setFile(rep+file, fileName);
   rwsf.readProcess(0);
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when saving "+file +ex, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){logError(ex,"Error when saving "+file, log);}
 }
 
 public void copyGeneralFiles() {
@@ -116,7 +126,8 @@ public void writeFile2(String fname, StringBuilder sb) throws FileNotFoundExcept
             w.write(sb.toString());
             w.close();
         }
-        catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when writing the file" +ex, "Error", JOptionPane.ERROR_MESSAGE);};}
+        catch(Exception ex){logError(ex,"Error when writing the file", log);}
+}
 
 public ArrayList<String> getConfigValue(String name, String message, String heading) {
 ArrayList<String> key = new ArrayList<>();
@@ -136,6 +147,16 @@ else
   }
 return key;
     }
+
+public void writeLog() {
+Utils ux = new Utils("./");
+ux.writeFile("errorlog.txt", errorLog);
+}
+
+protected void logError(Exception ex, String item, boolean type) {
+if (type == false) {JOptionPane.showMessageDialog(null, "Caught Exception"+ex+item, "Error", JOptionPane.ERROR_MESSAGE);}
+else {errorLog.append("Caught Exception"+ex+item+"\n");}
+}
 
 public String getValue (String message, String heading) {
 String s = JOptionPane.showInputDialog(null, message, heading, JOptionPane.QUESTION_MESSAGE);

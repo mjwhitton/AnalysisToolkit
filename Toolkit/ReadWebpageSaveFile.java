@@ -16,17 +16,22 @@ private boolean autoName;
 private int byteRate;
 
 public ReadWebpageSaveFile (int bytes) {
-atEnd = false;
+initialise();
 byteRate = bytes;
-Utils ut = new Utils();
 outputPath="./output_files/";
+
 }
 
 public ReadWebpageSaveFile (int bytes, String path) {
-atEnd = false;
+initialise();
 byteRate = bytes;
-Utils ut = new Utils();
 outputPath=path;
+}
+
+private void initialise() {
+atEnd = false; 
+utl = new Utils();
+log = true;
 }
 
 public String autoName(String fileurl) {
@@ -51,5 +56,5 @@ start = startnum;
 InputStream is = getUrl(url);
 saveFile(destinationFile, is, byteRate);
 }
-     
+
 }

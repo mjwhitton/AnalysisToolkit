@@ -37,7 +37,7 @@ public void process(BufferedReader rd) {
 try {
 readLineToArrayList(rd);
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when writing the file" +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"Error when writing the file",log);}
 }
 
 }

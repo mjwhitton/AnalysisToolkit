@@ -6,7 +6,6 @@ package Toolkit;
  * @version (13/10/17)
  */
 
-import org.apache.commons.csv.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
@@ -23,6 +22,8 @@ protected StringBuilder sbTx;
 protected ArrayList<String> list;
 protected String[] columns;
 protected String outputPath;
+protected boolean log;
+protected Toolkit.Utils utl;
 
 abstract public void readProcess(int startnum) ;
     
@@ -30,7 +31,7 @@ protected void readFile() {
 try {
   BufferedReader rd = Files.newBufferedReader(path);
   process(rd);}
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex+path, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){utl.logError(ex,path.toString(), log);};
 }
 
 
@@ -44,7 +45,7 @@ String webText = "";
 //Open url, if this is not found print the error message
 try {
   is = new URL(url).openStream();}
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex+url, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){utl.logError(ex,url,log);};
 return is;
      }
 
@@ -57,7 +58,7 @@ try {
   //Stop reading the url
   is.close();}
   //If there is an error print the message
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){utl.logError(ex,"",log);};
 }
  
 protected void saveFile(String destinationFile, InputStream is, int byteRate) {
@@ -71,7 +72,7 @@ try {
     is.close();
 	os.close();
     }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Caught Exception"+ex, "Error", JOptionPane.ERROR_MESSAGE);};
+catch(Exception ex){utl.logError(ex,"",log);};
 	}
 
 protected void readCharToStringBuilder(BufferedReader rd) throws IOException {
@@ -114,6 +115,10 @@ return  list;
 
 public Boolean atEnd() {
 return atEnd;   
+}
+
+public void writeLog() {
+utl.writeLog();
 }
 
 }
