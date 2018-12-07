@@ -48,6 +48,7 @@ catch(Exception ex){logError(ex,"Error when creating " + folder, log);}
 }
 
 public void setFolder(String fol) {
+createFolder(fol);
 folder = fol;
 }
 
@@ -153,7 +154,7 @@ Utils ux = new Utils("./");
 ux.writeFile("errorlog.txt", errorLog);
 }
 
-protected void logError(Exception ex, String item, boolean type) {
+public void logError(Exception ex, String item, boolean type) {
 if (type == false) {JOptionPane.showMessageDialog(null, "Caught Exception"+ex+item, "Error", JOptionPane.ERROR_MESSAGE);}
 else {errorLog.append("Caught Exception"+ex+item+"\n");}
 }

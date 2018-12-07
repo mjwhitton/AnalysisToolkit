@@ -45,6 +45,13 @@ url = fileurl;
 destinationFile = filename;
 }
 
+public void setFilePath (String fileurl, String filename, String path) {
+setFile(fileurl, filename);
+Toolkit.Utils ut = new Toolkit.Utils();
+ut.createFolder(path);
+outputPath = path;
+}
+
 @Override
 public void process(BufferedReader rd) {
 //Not needed
