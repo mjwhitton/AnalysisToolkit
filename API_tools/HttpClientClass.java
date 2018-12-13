@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
@@ -45,6 +44,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,10 +65,12 @@ private String url;
 private CloseableHttpClient httpClient;
 private HttpClientContext context;
 private String encoding = "utf-8";
-CloseableHttpResponse response;
+private CloseableHttpResponse response;
     
 public HttpClientClass(String url, String username, String password) {
 this.url = url;
+utl = new Toolkit.Utils();
+log = false;
 try
   {
   context = HttpClientContext.create();
@@ -88,6 +90,8 @@ catch (Exception ioe)
 
 public HttpClientClass(String url) {
 this.url = url;
+utl = new Toolkit.Utils();
+log = false;
 try
   {
   httpClient = HttpClients.createDefault();
@@ -127,10 +131,7 @@ sbTx = new StringBuilder();
 String getUrl = url+urlSufix;
 //System.out.println(getUrl);
 HttpGet httpget = new HttpGet(getUrl);
-for (String h : headers.keySet())
-  {
-  httpget.addHeader(h, headers.get(h));
-  }
+headers.keySet().forEach((h) -> {httpget.addHeader(h, headers.get(h));});
 allHeaders = httpget.getAllHeaders();
 //printHeaders(allHeaders);
 try
@@ -140,24 +141,22 @@ try
   //System.out.println(response);
   getResponse();
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);;}
 return sbTx;
 }
 
 public StringBuilder postParams(String urlSuffix, HashMap<String,String> headers, HashMap<String,String> params) throws UnsupportedEncodingException {
 sbTx = new StringBuilder();
 HttpPost httppost = new HttpPost(url+urlSuffix);
-for (String h : headers.keySet())
-  {
-  httppost.addHeader(h, headers.get(h));
-  }
+headers.keySet().forEach((h) -> {httppost.addHeader(h, headers.get(h));});
 allHeaders = httppost.getAllHeaders();
 StringBuilder stEntity= new StringBuilder();
-for (String p: params.keySet())
-  {
-  if (!p.equals("N/A")) {stEntity.append(p).append("=");}
-  stEntity.append(params.get(p)).append("\n");
-  }
+params.keySet().stream().map((p) -> {
+    if (!p.equals("N/A")) {stEntity.append(p).append("=");}
+        return p;
+    }).forEachOrdered((p) -> {
+        stEntity.append(params.get(p)).append("\n");
+    });
 httppost.setEntity(new StringEntity(stEntity.toString()));
 
 printHeaders(allHeaders);
@@ -168,7 +167,7 @@ try
   else {response = httpClient.execute(httppost, context);}
   getResponse();
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);}
 
 return sbTx;
 }
@@ -178,11 +177,12 @@ sbTx = new StringBuilder();
 String postUrl = url+urlSuffix;
 System.out.println(postUrl);
 HttpPost httppost = new HttpPost(postUrl);
-for (String h : headers.keySet())
-  {
-  System.out.println(h + " " + headers.get(h));
-  httppost.addHeader(h, headers.get(h));
-  }
+headers.keySet().stream().map((h) -> {
+    System.out.println(h + " " + headers.get(h));
+        return h;
+    }).forEachOrdered((h) -> {
+        httppost.addHeader(h, headers.get(h));
+    });
 allHeaders = httppost.getAllHeaders();
 httppost.setEntity(new StringEntity(filedata, format));
 
@@ -194,14 +194,12 @@ try
   else {response = httpClient.execute(httppost, context);}
   getResponse();
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);}
 return sbTx;
 }
 
 private void printHeaders(Header[] headers) {
-for (int i=0; i<headers.length;i++) {
-System.out.println(headers[i]);
-}
+for (Header header : headers) {System.out.println(header);}
 }
 
 private void getResponse () throws IOException {
@@ -234,8 +232,7 @@ catch (IOException e) {System.err.println("Caught IOException: " + e.getMessage(
 public String extractNestedJson(JSONObject json, String name, ArrayList<String> nameList, ArrayList<String> typeList, String separator) throws JSONException
 {
 //Extract readers sub-object
-if(!json.has(name)) {return "N/A";} 
-StringBuilder sb = new StringBuilder();
+if(!json.has(name)) {return "N/A"+separator;} 
 //Extract the sub-json object
 JSONObject subJson = json.getJSONObject(name);
 String nj = extractJson(subJson, nameList, typeList, separator);
@@ -263,8 +260,14 @@ for (int i=0; i < nameList.size(); i++)
   else if (json.has(curName) && curtype.equals("double")) {sb.append(json.getDouble(curName)).append(separator);}
   //Get integer values and append them and a comma
   else if (json.has(curName) && curtype.equals("int")) {sb.append(json.getInt(curName)).append(separator);}
-  //Append n/a and a comma if that metric was not found. Unless it's part of the readers sub-object
-  else if (!curtype.startsWith("readers")) {sb.append("n/a,");}
+  else if (json.has(curName) && curtype.equals("array"))
+    {
+    JSONArray jsArray = json.getJSONArray(curName);
+    if(jsArray.length()!=1) {sb.append(jsArray.toString()).append(separator);}
+    else {sb.append(jsArray.getString(0)).append(separator);}
+    }
+  //Append n/a and a comma if that metric was not found
+  else {sb.append("N/A").append(separator);}
   }
 String s = sb.toString();
 s = s.replaceAll("\n", "");

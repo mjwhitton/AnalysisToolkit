@@ -1,0 +1,11 @@
+name,title,type
+doi,DOI,string
+url,URL,string
+title,Title,string
+container-title,Publisher,string
+description,Description,string
+resource-type-id,Type,string
+resource-type-subtype,Sub Type,string
+published,PublishedDate,string
+registered,RegisteredDate,string
+updated,UpdatedDate,string

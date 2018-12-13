@@ -8,44 +8,41 @@ package API_tools;
  * @version (a version number or a date)
  */
 
-import Toolkit.ReadWebpageSaveFile;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
 import java.nio.file.*;
-import javax.swing.JOptionPane;
 import org.apache.commons.csv.CSVRecord;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GetAltmetric extends Toolkit.ReadProcessCsv {
 private JSONObject json;
 private HashMap<String,String> headers;
-private PrintStream errorLog;
-private String[] titleList;
-private String[] nameList;
-private String[] typeList;
-
+private ArrayList<String> titleList;
+private ArrayList<String> nameList;
+private ArrayList<String> typeList;
+private ArrayList<String> rdrNames;
+private ArrayList<String> rdrTypes;
+private boolean log;
+private Toolkit.Utils utl;
 
 public GetAltmetric() {
+copyConfigFile(false);
 initialise();
 separator = ","; 
-// Set Error and System logs to go to Errors.txt
-try{errorLog = new PrintStream("Errors.txt");}
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating errors.txt" +ex, "Error", JOptionPane.ERROR_MESSAGE);} 
-System.setOut(errorLog);
-System.setErr(errorLog);  
 }
 
 public GetAltmetric(String sep, boolean isTesting) {
+copyConfigFile(false);
 initialise();
 separator = sep; 
-if (isTesting==false)
-  {
-  try{errorLog = new PrintStream("Errors.txt");}
-  catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when creating errors.txt" +ex, "Error", JOptionPane.ERROR_MESSAGE);} 
-  System.setOut(errorLog);
-  System.setErr(errorLog);
-  }
+}
+
+private void copyConfigFile(boolean overwrite) {
+//copy files from GitHub if needed
+Toolkit.Utils ut = new Toolkit.Utils("./config/");
+File f = new File("./config/altmetric_config.csv");
+if (!f.exists() || overwrite==true) {ut.copyFileFromGithub("altmetric_default_config.csv", "altmetric_config.csv");}
 }
 
 private void initialise() {
@@ -60,23 +57,9 @@ searchTerm="ExtractMetrics";
 headers = new HashMap<>();
 headers.put("user-agent", "MWhitton_AltMetric_Tools/1.1 (mailto:mw2@soton.ac.uk)");
 //Import config files into Arrays
+utl = new Toolkit.Utils();
+log = false;
 buildMaps();
-}
-
-private void copyFile(String file, String folder) {
-copyFile(file, file, folder);
-}
-
-private void copyFile(String file, String fileName, String folder) {
-try
-  {
-  Files.createDirectories(Paths.get(folder));
-  String rep = "https://raw.githubusercontent.com/mjwhitton/AnalysisToolkit/master/example_files/";
-  ReadWebpageSaveFile rwsf = new ReadWebpageSaveFile(2048, folder+"/");
-  rwsf.setFile(rep+file, fileName);
-  rwsf.readProcess(0);
-  }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error when saving examples and config files" +ex, "Error", JOptionPane.ERROR_MESSAGE);};
 }
 
 private void buildMaps() {
@@ -88,25 +71,34 @@ try
   List<CSVRecord> records = cs.readProcess();
   int numHeaders = records.size();
   //Create three arrays to store the configuration information
-  titleList = new String[numHeaders];
-  typeList = new String[numHeaders];
-  nameList = new String[numHeaders];
+  titleList = new ArrayList<>();
+  typeList = new ArrayList<>();
+  nameList = new ArrayList<>();
+  rdrTypes = new ArrayList<>();
+  rdrNames = new ArrayList<>();
   //Parse the config file and populate the arrays
   for (int i=0; i<records.size(); i++) 
     {
     CSVRecord row = records.get(i);
-    titleList[i] = row.get("title");
-    nameList[i] = row.get("name");
-    typeList[i] = row.get("type");
+    if(row.get("type").startsWith("readers."))
+      {
+    rdrTypes.add(row.get("type").substring(8));
+    rdrNames.add(row.get("name"));    
+      }
+    else
+      {
+      nameList.add(row.get("name"));
+      typeList.add(row.get("type"));
+      }
+    titleList.add(row.get("title"));
     }
   }
 catch (Exception ex1)
-  {
-  JOptionPane.showMessageDialog(null, "Error when loading the config file" +ex1, "Error", JOptionPane.ERROR_MESSAGE);
+  {utl.logError(ex1,"Error when loading the config file",log);
 //If an error is present add a message to the arrays
-titleList = new String[]{"error"};
-typeList = new String[]{"error"};
-nameList = new String[]{"error"};
+titleList.add(0,"error");
+typeList.add(0,"error");
+nameList.add(0,"error");
   }
 }
 
@@ -117,7 +109,7 @@ try
   readCsv();
 //System.out.println(map);
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);}
 return csvList;
 }
 
@@ -151,17 +143,17 @@ for (String c : map.keySet())
 if(returnAll=true) {row = appendAllCols(cm);}
 String metrics = "error";
 try {metrics = getMetrics(record.get(0), record.get(1));}
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);}
 row.append(metrics);
 list.add(row.toString());
 }
 
 public String getMetrics (String uri, String type) {
-String metrics;
+String metrics="";
 //Make sure type is lowercase
 type = type.toLowerCase();
 //If no error
-if (!nameList.equals("error")) {
+if (!nameList.get(0).equals("error")) {
 // Extract metrics
 metrics = useAltMetricApi(uri, type);}
 //If an error add a message
@@ -175,24 +167,6 @@ private String appendDQ(String str) {
 return "\"" + str + "\"";
 }
   
-private String extractNestedJson(JSONObject json, String name) throws JSONException
-{
-StringBuilder sb = new StringBuilder();
-//Extract the sub-json object
-JSONObject subJson = json.getJSONObject(name);
-//iterate over the nameList array
-for (int i = 0; i < nameList.length; i++)
-  {//Get the corrosponding type and name
-  String curtype = typeList[i];
-  String CurName = nameList[i];
-  //Append int value and a comma, only if it is part of the sub-object. These values should have a curtype of [subobject name].type
-  if (subJson.has(CurName) && curtype.equals(name+".int")) {sb.append(subJson.getInt(CurName)).append(separator);}
-  //Append n/a and a comma for any missing values that should be in the sub-object
-  else if (curtype.startsWith(name)) {sb.append("n/a,");}    
-  }
-return sb.toString();
-   }
-
 public String useAltMetricApi(String uri, String type)
 {
 String metrics=""; 
@@ -207,38 +181,18 @@ if (result.charAt(0) == '{')
   try
     {
     json = new JSONObject(result.toString());
-    metrics = extractJson(json);
+    metrics = api.extractJson(json, nameList, typeList, separator);
+    metrics = metrics + api.extractNestedJson(json, "readers", rdrNames, rdrTypes, separator);
+    //metrics = extractJson(json);
     }
-  catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+  catch(Exception ex){utl.logError(ex,"",log);}
   }
 else {metrics = result.toString();}
  
 return metrics;
 }
 
-private String extractJson(JSONObject json) throws JSONException {
-//Create StringBuilder 
-StringBuilder sb = new StringBuilder();
-//Iterate over the nameList array of all the metrics to look for
-for (int i=0; i < nameList.length; i++)
-  {//Get the corrosponding type and name
-  String curtype = typeList[i];
-  String curName = nameList[i];
-  //Get string values and append them with double quotes, and add a comma
-  if (json.has(curName) && curtype.equals("string")) {sb.append(appendDQ(json.getString(curName))).append(separator);}
-  // If url was not found (error json recieved) append Error and a comma
-  else if (json.has("Error")) {sb.append("Error"+",");}
-  //Get double values and append them and a comma
-  else if (json.has(curName) && curtype.equals("double")) {sb.append(json.getDouble(curName)).append(separator);}
-  //Get integer values and append them and a comma
-  else if (json.has(curName) && curtype.equals("int")) {sb.append(json.getInt(curName)).append(separator);}
-  //Append n/a and a comma if that metric was not found. Unless it's part of the readers sub-object
-  else if (!curtype.startsWith("readers")) {sb.append("n/a,");}
-  }
-//Extract readers sub-object
-if(json.has("readers")){sb.append(extractNestedJson(json, "readers"));}
-//Add an end of row
-return sb.toString();
-  }
-
+public void writeLog() {
+utl.writeLog();
+}
 }

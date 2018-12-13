@@ -9,6 +9,7 @@ package API_tools;
  */
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.json.JSONException;
@@ -20,6 +21,12 @@ import org.apache.commons.csv.CSVRecord;
 public class GetScopus extends Toolkit.ReadProcessCsv {
 private String apiKey;
 private String doi;
+private boolean log;
+private Toolkit.Utils utl;
+private ArrayList<String> searchNames;
+private ArrayList<String> searchTypes;
+private ArrayList<String> entryNames;
+private ArrayList<String> entryTypes;
 
 public GetScopus(String key) {
 initialise();
@@ -42,6 +49,12 @@ analysisColumn = analysisCol;
 process="ScopusAPI";
 searchTerm="DOI";
 returnList = true;
+utl = new Toolkit.Utils();
+log = false;
+searchNames = new ArrayList<>(Arrays.asList("opensearch:totalResults"));
+searchTypes = new ArrayList<>(Arrays.asList("int"));
+entryNames = new ArrayList<>(Arrays.asList("prism:doi"));
+entryTypes = new ArrayList<>(Arrays.asList("string"));
 }
 
 public List<CSVRecord> getScopusDOIs(Path p) {
@@ -51,7 +64,7 @@ try
   readCsv();
   //System.out.println(map);
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);}
 return csvList;
 }
 
@@ -71,19 +84,18 @@ public String extractScopusDOI(String eid, HashMap<String,String> headers) throw
 String urlsuffix = "content/search/scopus?query=EID("+eid.trim()+")&apiKey="+apiKey;
 API_tools.HttpClientClass api = new API_tools.HttpClientClass("https://api.elsevier.com/");
 StringBuilder result = api.getUrl(urlsuffix, headers);
-//StringBuilder result = getHttpClient(url, headName, headVal);
-//System.out.println(result);
 JSONObject json = new JSONObject(result.toString());
 JSONObject subjson1 = json.getJSONObject("search-results");
-String totalResults = "";
-if(subjson1.has("opensearch:totalResults")) {totalResults = subjson1.getString("opensearch:totalResults");}
-//System.out.println(totalResults);
+String totalResults = api.extractJson(subjson1, searchNames, searchTypes, "");
+if(!totalResults.equals("1")) {return "Found "+totalResults+" Scopus records matching this EID";}
 JSONArray subjson2 = subjson1.getJSONArray("entry");
 JSONObject subjson3 = subjson2.getJSONObject(0);
-doi = "";
-if(subjson3.has("prism:doi")) {doi = subjson3.getString("prism:doi");}
-if(doi.equals("") && !totalResults.equals("1")) {doi = "Scopus ID not found";}
-if(doi.equals("") && totalResults.equals("1")) {doi = "DOI not found";}
+doi = api.extractJson(subjson3, entryNames, entryTypes, "");
+if(doi.equals("") || doi == null) {return "DOI not found";}
 return doi;
 }
-    }
+
+public void writeLog() {
+utl.writeLog();
+}
+}

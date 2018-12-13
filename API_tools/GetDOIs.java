@@ -32,7 +32,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -47,6 +46,8 @@ private boolean finished;
 private ArrayList<String> titleList;
 private ArrayList<String> nameList;
 private ArrayList<String> typeList;
+private boolean log;
+private Toolkit.Utils utl;
 
 public GetDOIs() {
 separator = "@"; 
@@ -60,12 +61,13 @@ initialise();
 private void initialise() {
 list = new ArrayList<>();
 StringBuilder sb = new StringBuilder();
-for (String title : titleList)
-  {
-  //Add title and a comma
-  StringBuilder append = sb.append(title).append(separator);
-  }
+titleList.forEach((title) -> {
+//Add title and a comma
+StringBuilder append = sb.append(title).append(separator);
+    });
 list.add(sb.toString());
+utl = new Toolkit.Utils();
+log = false;
 }
 
 private void copyConfigFile(boolean overwrite) {
@@ -97,8 +99,7 @@ try
     }
   }
 catch (Exception ex1)
-  {
-  JOptionPane.showMessageDialog(null, "Error when loading the config file" +ex1, "Error", JOptionPane.ERROR_MESSAGE);
+  {utl.logError(ex1,"Error when loading the config file",log);
 //If an error is present add a message to the arrays
 titleList.add(0,"error");
 typeList.add(0,"error");
@@ -149,7 +150,10 @@ try
     }
   else {finished = true;}
   }
-catch (Exception ex1) {JOptionPane.showMessageDialog(null, "Error: " +ex1, "Error", JOptionPane.ERROR_MESSAGE);}
+catch (Exception ex1) {utl.logError(ex1,"",log);}
 }
 
+public void writeLog() {
+utl.writeLog();
+}
 }

@@ -10,17 +10,18 @@ package API_tools;
 
 import java.util.*;
 import java.nio.file.*;
-import javax.swing.JOptionPane;
 import org.apache.commons.csv.CSVRecord;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 public class GetCrossRef extends Toolkit.ReadProcessCsv {
 private JSONObject json;
-private HashMap<String,String> headers;
-String dates;
-
+private JSONObject subJson;
+private final HashMap<String,String> headers;
+private ArrayList<String> dateNames;
+private ArrayList<String> dateTypes;
+private ArrayList<String> nameList;
+private boolean log;
+private Toolkit.Utils utl;
 
 public GetCrossRef(HashMap<String,String> hders) {
 initialise();
@@ -43,6 +44,11 @@ int[] analysisCol = {0};
 analysisColumn = analysisCol;
 process="CrossRefAPI";
 searchTerm="Dates";
+utl = new Toolkit.Utils();
+log = false;
+dateNames = new ArrayList<>(Arrays.asList("date-parts"));
+dateTypes = new ArrayList<>(Arrays.asList("array"));
+nameList = new ArrayList<>(Arrays.asList("accepted","published-online","published-print"));
 }
 
 public List<CSVRecord> getCrossRefDates(Path p) {
@@ -52,7 +58,7 @@ try
   readCsv();
 //System.out.println(map);
   }
-catch(Exception ex){JOptionPane.showMessageDialog(null, "Error: " +ex, "Error", JOptionPane.ERROR_MESSAGE);}
+catch(Exception ex){utl.logError(ex,"",log);}
 return csvList;
 }
 
@@ -69,6 +75,7 @@ list.add(sb.toString());
 
 @Override
 protected String processColumn(String entry) {
+String dates = "";
 try{
 dates = useCrossRefAPI(entry);
 //System.out.println(doi);
@@ -79,35 +86,6 @@ catch(Exception ex){dates="Error when writing the file"+ex;}
 return dates;
 }
 
-private String cleanDate(String date) {
-StringBuilder sb = new StringBuilder();
-for(int i = 0; i < date.length();i++)
-  {
-  {char x = date.charAt(i);
-  if(x != '[' && x != ']' && x != ',') {sb.append(x);}
-  else if (x == ',') {sb.append("-");}
-  }
-}
-return sb.toString();
-}
-
-protected String getDates (String key, JSONObject json) throws JSONException {
-StringBuilder sb = new StringBuilder();
-if (json.has(key))
-  {
-  JSONObject subJson1 = json.getJSONObject(key); 
-  JSONArray subJson2 = subJson1.getJSONArray("date-parts");
-  //System.out.println(subJson2.length());
-  if(subJson2.length()!=1)
-  {sb.append(subJson2.toString()).append(separator);}
-  else {
-    sb.append(cleanDate(subJson2.getString(0))).append(separator);
-  }
-  }
-else {sb.append("N/A").append(separator);}
-return sb.toString();
-}
-
 public String useCrossRefAPI(String doi){
 StringBuilder row = new StringBuilder();
 String urlsuffix = "works/" + doi.trim();
@@ -115,27 +93,30 @@ API_tools.HttpClientClass api = new API_tools.HttpClientClass("https://api.cross
 StringBuilder result = api.getUrl(urlsuffix, headers);
 //System.out.println(result);
 //System.out.println(result);
-if (result.charAt(0) == '{') {row.append(extractJson(result));}
+if (result.charAt(0) == '{')
+  {
+  try
+    {
+    json = new JSONObject(result.toString());
+    if (json.has("message")) {subJson = json.getJSONObject("message");}
+    for (int i=0;i < nameList.size();i++)
+      {
+      String date = api.extractNestedJson(subJson, nameList.get(i), dateNames, dateTypes, separator);
+      //System.out.println(date);
+      date = date.replaceAll("(\\[)(\\d+)(\\,)(\\d+)(\\,)(\\d+)(\\])", "$6/$4/$2");
+      date = date.replaceAll("(\\[)(\\d+)(\\,)(\\d+)(\\])", "$4/$2");
+      row.append(date);
+      }
+    }
+  catch(Exception ex){return "Error: "+ex;}
+  }
 else {row.append(result.toString());}
 //System.out.println(row);
 return row.toString();
 }
 
-private String extractJson(StringBuilder result) {
-StringBuilder sb = new StringBuilder();
-try
-  {
-  json = new JSONObject(result.toString());
-  if (json.has("message"))
-    {
-    JSONObject subJson = json.getJSONObject("message");
-    sb.append(getDates("accepted", subJson));
-    sb.append(getDates("published-online", subJson));
-    sb.append(getDates("published-print", subJson));    
-    }
-  }
-catch(Exception ex){return "Error: "+ex;}
-return sb.toString();
+public void writeLog() {
+utl.writeLog();
 }
 
 }
