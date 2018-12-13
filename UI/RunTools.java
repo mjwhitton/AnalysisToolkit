@@ -57,8 +57,6 @@ private UI.Task task;
     readPrefs();
     Toolkit.Utils ut = new Toolkit.Utils("./config/");
     ut.copyGeneralFiles();
-    File f = new File("./config/altmetric_config.csv");
-    if (!f.exists()) {ut.copyFileFromGithub("altmetric_default_config.csv", "altmetric_config.csv", "/example_files/");}
   }
   
 public static String getSeparator() {
